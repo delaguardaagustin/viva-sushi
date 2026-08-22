@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Viva Sushi — Delivery San Ramón y La Granja</title>
+<meta name="description" content="Viva Sushi Delivery. Santa Rosa #8689, San Ramón. Pide por WhatsApp: para servir, llevar o delivery en San Ramón y La Granja.">
+<meta name="theme-color" content="#0d0b0c">
+<meta property="og:title" content="Viva Sushi — Delivery San Ramón y La Granja">
+<meta property="og:description" content="Pide tu sushi por WhatsApp. Santa Rosa #8689, San Ramón.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   VIVA SUSHI - pagina de pedidos
+   Para editar la CARTA y los PRECIOS, anda al bloque
+   "var CARTA = [...]" que esta en el <script> mas abajo.
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0b0c;
+  --bg2:#151112;
+  --card:#1c1718;
+  --line:#2e2627;
+  --rojo:#e02a35;
+  --rojo-osc:#b31f28;
+  --oro:#e8b44a;
+  --verde:#25d366;
+  --txt:#f6f1ec;
+  --txt2:#a89f9a;
+  --radio:16px;
+  --max:1080px;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  line-height:1.55;padding-bottom:96px;overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+.wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 18px}
+.display{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;letter-spacing:.02em;line-height:.95}
+
+/* ---------- HEADER ---------- */
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(13,11,12,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.nav{display:flex;align-items:center;gap:14px;height:60px}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em}
+.logo .dot{width:11px;height:11px;border-radius:50%;background:var(--rojo);box-shadow:0 0 14px var(--rojo)}
+.nav-links{margin-left:auto;display:flex;gap:20px;font-size:14px;font-weight:500;color:var(--txt2)}
+.nav-links a{text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--oro)}
+@media(max-width:720px){.nav-links{display:none}}
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative;padding:60px 0 46px;text-align:center;overflow:hidden;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(224,42,53,.30), transparent 60%),
+    radial-gradient(circle at 15% 90%, rgba(232,180,74,.10), transparent 55%),
+    var(--bg);
+}
+.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(115deg,transparent 0 22px,rgba(255,255,255,.014) 22px 23px);
+}
+.hero .wrap{position:relative;z-index:1}
+.hero .kicker{
+  display:inline-block;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--oro);border:1px solid rgba(232,180,74,.35);border-radius:999px;
+  padding:6px 15px;margin-bottom:22px;
+}
+.hero h1{font-size:clamp(60px,15vw,132px);margin-bottom:8px}
+.hero h1 span{color:var(--rojo)}
+.hero .sub{color:var(--txt2);font-size:clamp(14px,3.6vw,18px);max-width:520px;margin:0 auto 26px}
+.hero .sub b{color:var(--txt);font-weight:600}
+.cta-row{display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:14px 24px;border-radius:999px;font-weight:600;font-size:15px;
+  text-decoration:none;border:none;cursor:pointer;transition:transform .12s,filter .15s;
+  font-family:inherit;
+}
+.btn:active{transform:scale(.97)}
+.btn-wa{background:var(--verde);color:#062b14}
+.btn-wa:hover{filter:brightness(1.08)}
+.btn-ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--oro);color:var(--oro)}
+.btn svg{width:19px;height:19px;flex:none}
+
+/* ---------- INFO ---------- */
+.info{padding:34px 0 10px}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px}
+.info-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radio);padding:18px}
+.info-card .ic{font-size:20px;margin-bottom:8px}
+.info-card h3{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--oro);margin-bottom:6px;font-weight:600}
+.info-card p{font-size:14.5px;color:var(--txt);margin:0}
+.info-card p small{color:var(--txt2);font-size:13px;display:block;margin-top:3px}
+
+/* ---------- SECCIONES ---------- */
+section{scroll-margin-top:70px}
+.sec-head{text-align:center;padding:52px 0 24px}
+.sec-head .eyebrow{font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--rojo);font-weight:700;margin-bottom:8px}
+.sec-head h2{font-size:clamp(38px,8.5vw,62px)}
+.sec-head p{color:var(--txt2);font-size:14.5px;max-width:520px;margin:10px auto 0}
+
+/* ---------- MENU ---------- */
+.tabs{
+  display:flex;gap:8px;overflow-x:auto;padding:10px 18px 14px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  position:sticky;top:60px;z-index:40;
+  background:rgba(13,11,12,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  margin:0 -18px;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:none;padding:9px 16px;border-radius:999px;border:1px solid var(--line);
+  background:var(--card);color:var(--txt2);font-size:13.5px;font-weight:600;
+  cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;
+}
+.tab.on{background:var(--rojo);border-color:var(--rojo);color:#fff}
+
+.cat{padding-top:26px}
+.cat > h3{
+  font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.03em;
+  margin-bottom:4px;display:flex;align-items:center;gap:10px;
+}
+.cat > h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.cat .cat-note{color:var(--txt2);font-size:13.5px;margin-bottom:16px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.item{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radio);
+  padding:16px 16px 14px;display:flex;flex-direction:column;gap:9px;transition:border-color .15s;
+}
+.item:hover{border-color:#413637}
+.item-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.item h4{font-size:15.5px;font-weight:600;line-height:1.3}
+.item .desc{font-size:13.3px;color:var(--txt2);flex:1}
+.price{font-family:'Bebas Neue',sans-serif;font-size:23px;color:var(--oro);white-space:nowrap;letter-spacing:.02em}
+.item-foot{display:flex;align-items:center;gap:10px;margin-top:2px;min-height:36px}
+.tag{
+  font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--rojo);
+  border:1px solid rgba(224,42,53,.4);border-radius:999px;padding:3px 9px;font-weight:700;
+}
+.add{
+  margin-left:auto;background:var(--rojo);color:#fff;border:none;border-radius:10px;
+  padding:9px 16px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:transform .1s,background .15s;
+}
+.add:hover{background:var(--rojo-osc)}
+.add:active{transform:scale(.94)}
+.qty{display:flex;align-items:center;margin-left:auto;background:#000;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.qty button{width:34px;height:34px;background:none;border:none;color:var(--txt);font-size:17px;cursor:pointer;font-family:inherit}
+.qty button:hover{background:var(--line)}
+.qty span{min-width:26px;text-align:center;font-weight:700;font-size:14px}
+
+/* ---------- SOCIAL ---------- */
+.social{padding:20px 0 46px}
+.social-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.soc{
+  display:flex;align-items:center;gap:13px;padding:17px;border-radius:var(--radio);
+  border:1px solid var(--line);background:var(--card);text-decoration:none;transition:all .15s;
+}
+.soc:hover{transform:translateY(-2px);border-color:#463a3b}
+.soc .sic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none}
+.soc .sic svg{width:22px;height:22px;fill:#fff}
+.soc b{display:block;font-size:14.5px}
+.soc small{color:var(--txt2);font-size:12.5px}
+.ig{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}
+.fb{background:#1877f2}
+.wa{background:#25d366}
+
+/* ---------- BARRA CARRITO ---------- */
+.bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  background:rgba(13,11,12,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding:11px 0 calc(11px + env(safe-area-inset-bottom));
+  transform:translateY(130%);transition:transform .28s cubic-bezier(.2,.8,.2,1);
+}
+.bar.show{transform:translateY(0)}
+.bar-in{display:flex;align-items:center;gap:12px}
+.bar-info{flex:1;min-width:0}
+.bar-info b{display:block;font-size:15px}
+.bar-open{background:none;border:none;color:var(--txt2);font-size:12.5px;text-decoration:underline;cursor:pointer;font-family:inherit;padding:0}
+.bar .btn{padding:13px 20px;font-size:14.5px}
+
+/* ---------- MODAL ---------- */
+.modal{
+  position:fixed;inset:0;z-index:100;display:none;
+  background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+}
+.modal.show{display:flex;align-items:flex-end;justify-content:center}
+.sheet{
+  background:var(--bg2);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;
+  border-radius:22px 22px 0 0;border:1px solid var(--line);border-bottom:none;
+  padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+  animation:up .28s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@media(min-width:600px){.modal.show{align-items:center}.sheet{border-radius:22px;border-bottom:1px solid var(--line)}}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sheet-head h3{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.03em}
+.x{background:none;border:none;color:var(--txt2);font-size:26px;cursor:pointer;line-height:1;padding:0 4px}
+.line{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.line .ln{flex:1;min-width:0}
+.line .ln b{display:block;font-weight:600}
+.line .ln small{color:var(--txt2);font-size:12.5px}
+.line .lp{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--oro);white-space:nowrap;min-width:64px;text-align:right}
+.total{display:flex;justify-content:space-between;align-items:center;padding:16px 0 6px;font-size:16px;font-weight:600}
+.total .tv{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--oro)}
+.field{margin-top:14px}
+.field label{display:block;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--oro);margin-bottom:7px;font-weight:600}
+.field input,.field textarea{
+  width:100%;background:#000;border:1px solid var(--line);border-radius:11px;
+  padding:12px 14px;color:var(--txt);font-family:inherit;font-size:15px;
+}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--rojo)}
+.field textarea{resize:vertical;min-height:62px}
+.seg{display:flex;gap:7px}
+.seg button{
+  flex:1;padding:11px 6px;border-radius:11px;border:1px solid var(--line);background:#000;
+  color:var(--txt2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.seg button.on{background:var(--rojo);border-color:var(--rojo);color:#fff}
+.sheet .btn{width:100%;margin-top:18px}
+.empty{text-align:center;color:var(--txt2);padding:26px 0;font-size:14px}
+.aviso{font-size:12px;color:var(--txt2);text-align:center;margin-top:11px;line-height:1.5}
+.nodeliv{
+  font-size:12.5px;line-height:1.5;color:var(--oro);background:rgba(232,180,74,.08);
+  border:1px solid rgba(232,180,74,.28);border-radius:11px;padding:9px 12px;margin-top:4px;
+}
+.nodeliv b{color:var(--oro)}
+
+/* ---------- FOOTER ---------- */
+footer{border-top:1px solid var(--line);padding:34px 0;text-align:center;color:var(--txt2);font-size:13px}
+footer .fl{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--txt);letter-spacing:.04em;margin-bottom:8px}
+footer a{color:var(--txt2)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo"><span class="dot"></span>VIVA SUSHI</div>
+    <nav class="nav-links">
+      <a href="#carta">Carta</a>
+      <a href="#info">Información</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <span class="kicker">Delivery · San Ramón y La Granja</span>
+    <h1 class="display">VIVA<br><span>SUSHI</span></h1>
+    <p class="sub">Puedes pedir <b>para servir</b>, <b>para llevar</b> o <b>delivery</b>. Arma tu pedido acá abajo y te lo enviamos directo por WhatsApp.</p>
+    <div class="cta-row">
+      <a class="btn btn-wa" href="#carta">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
+        Ver la carta y pedir
+      </a>
+      <a class="btn btn-ghost" href="https://wa.me/56997887871?text=Hola%20Viva%20Sushi%2C%20tengo%20una%20consulta" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<section class="info" id="info">
+  <div class="wrap">
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="ic">📍</div>
+        <h3>Dirección</h3>
+        <p>Santa Rosa #8689<small>San Ramón, Región Metropolitana</small></p>
+      </div>
+      <div class="info-card">
+        <div class="ic">🕐</div>
+        <h3>Horario</h3>
+        <p>Martes a Sábado<small>13:00 a 22:00 hrs · Lunes cerrado</small></p>
+      </div>
+      <div class="info-card">
+        <div class="ic">🛵</div>
+        <h3>Reparto</h3>
+        <p>San Ramón y La Granja<small>El despacho tiene costo adicional según sector. También para servir o para llevar.</small></p>
+      </div>
+      <div class="info-card">
+        <div class="ic">💳</div>
+        <h3>Medios de pago</h3>
+        <p>Débito, crédito y efectivo<small>Transferencia · Pluxee · Edenred</small></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="carta">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Nuestra carta</div>
+      <h2 class="display">ARMA TU PEDIDO</h2>
+      <p>Toca <b>Agregar</b> en lo que quieras. Al final revisas el pedido y lo envías por WhatsApp con un solo toque.<br><b style="color:var(--oro)">Verdura opcional: cualquier cambio, avísanos al hacer tu pedido.</b></p>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div id="menu"></div>
+  </div>
+</section>
+
+<section class="social" id="contacto">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Contacto</div>
+      <h2 class="display">SÍGUENOS</h2>
+    </div>
+    <div class="social-grid">
+      <a class="soc" href="https://wa.me/56997887871" target="_blank" rel="noopener">
+        <span class="sic wa"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg></span>
+        <span><b>WhatsApp</b><small>+56 9 9788 7871</small></span>
+      </a>
+      <a class="soc" href="https://www.instagram.com/viva.sushi" target="_blank" rel="noopener">
+        <span class="sic ig"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4 1.3-.1 1.7-.1 4.9-.1zm0 3.2A6.6 6.6 0 1 0 18.6 12 6.6 6.6 0 0 0 12 5.4zm0 10.9A4.3 4.3 0 1 1 16.3 12 4.3 4.3 0 0 1 12 16.3zm6.9-11.1a1.5 1.5 0 1 1-1.5-1.5 1.5 1.5 0 0 1 1.5 1.5z"/></svg></span>
+        <span><b>Instagram</b><small>@viva.sushi</small></span>
+      </a>
+      <a class="soc" href="https://www.facebook.com/profile.php?id=100055189432842" target="_blank" rel="noopener">
+        <span class="sic fb"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>
+        <span><b>Facebook</b><small>Viva Sushi · San Ramón</small></span>
+      </a>
+      <a class="soc" href="https://www.google.com/maps/search/?api=1&amp;query=Santa+Rosa+8689+San+Ram%C3%B3n+Santiago" target="_blank" rel="noopener">
+        <span class="sic" style="background:#e02a35"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 14.5 9 2.5 2.5 0 0 1 12 11.5z"/></svg></span>
+        <span><b>Cómo llegar</b><small>Santa Rosa #8689, San Ramón</small></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fl">VIVA SUSHI</div>
+    <p>Santa Rosa #8689, San Ramón · Martes a Sábado 13:00–22:00</p>
+    <p style="margin-top:6px"><a href="https://wa.me/56997887871">+56 9 9788 7871</a></p>
+  </div>
+</footer>
+
+<div class="bar" id="bar">
+  <div class="wrap bar-in">
+    <div class="bar-info">
+      <b id="barTotal">$0</b>
+      <button class="bar-open" id="barOpen">Ver mi pedido (<span id="barCount">0</span>)</button>
+    </div>
+    <button class="btn btn-wa" id="barGo">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
+      Pedir
+    </button>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3>TU PEDIDO</h3>
+      <button class="x" id="close" aria-label="Cerrar">&times;</button>
+    </div>
+    <div id="lines"></div>
+    <div class="total"><span>Total</span><span class="tv" id="mTotal">$0</span></div>
+    <p class="nodeliv" id="nodeliv">🛵 El total <b>no incluye el despacho</b>. El costo se confirma por WhatsApp según tu sector.</p>
+
+    <div class="field">
+      <label>¿Cómo lo quieres?</label>
+      <div class="seg" id="modo">
+        <button class="on" data-m="Delivery">🛵 Delivery</button>
+        <button data-m="Retiro en local">🥡 Retiro</button>
+        <button data-m="Para servir">🍽️ Servir</button>
+      </div>
+    </div>
+    <div class="field"><label>Tu nombre</label><input id="nombre" placeholder="Ej: Camila Rojas" autocomplete="name"></div>
+    <div class="field" id="fDir"><label>Dirección de entrega</label><input id="direccion" placeholder="Calle, número, depto — comuna" autocomplete="street-address"></div>
+    <div class="field"><label>Comentarios (opcional)</label><textarea id="nota" placeholder="Sin palta, salsa extra, tocar el timbre..."></textarea></div>
+
+    <button class="btn btn-wa" id="send">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
+      Enviar pedido por WhatsApp
+    </button>
+    <p class="aviso">Se abre WhatsApp con tu pedido ya escrito. El pedido queda confirmado cuando el local te responde.</p>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1) NUMERO DE WHATSAPP (formato internacional, sin + ni espacios)
+   ============================================================ */
+var WHATSAPP = "56997887871";
+
+/* ============================================================
+   2) LA CARTA  <<<--- EDITA ACA
+   Cada categoria: { cat:"Nombre", nota:"texto opcional",
+                     items:[ {n:"Nombre", d:"descripcion", p:precio, tag:"etiqueta opcional"} ] }
+   El precio va como numero entero, sin puntos: 12990
+   ============================================================ */
+var CARTA = [
+  { cat:"Promociones VIVA", nota:"Todas incluyen salsas a elección. Rolls de 10 piezas.", items:[
+    {n:"VIVA 1 — 20 piezas frías", d:"10 pzs California Kani (kanikama, queso crema, cebollín, en sésamo o ciboulette) + 10 pzs Maki Cheese (queso crema, cebollín, en alga nori). 1 salsa a elección.", p:4000, tag:"Económica"},
+    {n:"VIVA 2 — 20 piezas frías", d:"10 pzs California Vegeta (palmito, queso crema, cebollín, en sésamo o ciboulette) + 10 pzs Maki Palta (palta, cebollín, en alga nori). 1 salsa a elección.", p:4000},
+    {n:"VIVA 3 — 20 piezas", d:"10 fritas + 10 frías. Cheese Tory (pollo teriyaki, palta, cebollín, en queso crema) + Tempura Ebi (camarón, queso crema, cebollín, frito). 2 salsas a elección.", p:7000},
+    {n:"VIVA 4 — 20 piezas fritas", d:"Tempura Tory (pollo teriyaki, queso crema, cebollín) + Tempura Kani (kanikama, queso crema, cebollín). 2 salsas a elección.", p:6500},
+    {n:"VIVA 5 — 20 piezas", d:"10 fritas + 10 frías. Tempura Ebi (camarón, queso crema, cebollín) + California Kani (kanikama, queso crema, cebollín, en sésamo o ciboulette). 2 salsas a elección.", p:6500},
+    {n:"VIVA 6 — 30 piezas", d:"10 fritas + 20 frías. Tempura Sake + Avocado Vegeta + Maki Palta. 2 salsas a elección.", p:8500},
+    {n:"VIVA 7 — 30 piezas frías", d:"Cheese Vegeta + California Cheese + Avocado Tory. 2 salsas a elección.", p:9500, tag:"Popular"},
+    {n:"VIVA 8 — 40 piezas", d:"10 fritas + 30 frías. Tempura Light + California Cheese + Cheese Vegeta + Maki Cheese. 3 salsas a elección.", p:11000},
+    {n:"VIVA 9 — 40 piezas", d:"20 fritas + 20 frías. Tempura Tory + Tempura Kani + California Ebi + Avocado Sake. 4 salsas a elección.", p:13500},
+    {n:"VIVA 10 — 50 piezas", d:"20 fritas + 30 frías. Tempura Tory + Tempura Kani + Avocado Sake + California Cheese + Maki Palta. 4 salsas a elección.", p:15000},
+    {n:"VIVA 11 — 30 piezas fritas + handroll", d:"Tempura Tory + Tempura Ebi + Tempura Kani + Hand Roll de Pollo. 3 salsas a elección.", p:12000},
+    {n:"VIVA 12 — 60 piezas", d:"30 fritas + 30 frías. Tempura Tory + Tempura Ebi + Tempura Kani + Cheese Tory + Avocado Vegeta + Maki Cheese. 4 salsas a elección.", p:17500, tag:"Para grupo"},
+    {n:"VIVA 13 — 80 piezas", d:"30 fritas + 50 frías. 20 pzs Tempura Tory + Tempura Kani + California Vegeta + California Kani + Cheese Tory + Hosomaki Ebi + Hosomaki Choclo. 6 salsas a elección.", p:20000},
+    {n:"VIVA 14 — 80 piezas premium", d:"40 fritas + 40 frías. Tempura Tory + Tempura Ebi + Tempura Kani + Tempura Light + Avocado Ebi + Cheese Tory + California Vegeta + Futomaki Sake. 7 salsas a elección.", p:24000, tag:"Premium"},
+    {n:"VIVA 15 — 100 piezas", d:"50 fritas + 50 frías. 20 pzs Tempura Tory + Tempura Ebi + Tempura Choclo + Tempura Kani + California Vegeta + Cheese Tory + Avocado Tory + California Sake + Futomaki Cheese. 9 salsas a elección.", p:28000, tag:"La más grande"}
+  ]},
+
+  { cat:"Rolls especiales", nota:"Nuestras creaciones de la casa.", items:[
+    {n:"E1 · Roll cheese apanado", d:"Pollo, palta, cebollín. Envuelto en queso crema y frito.", p:4500},
+    {n:"E2 · Roll acevichado", d:"Camarón tempura, queso crema, cebollín, envuelto en salmón. Bañado en salsa acevichada.", p:4900, tag:"Recomendado"},
+    {n:"E3 · Cheese especial", d:"Camarón, palta, cebollín, envuelto en queso crema y espolvoreado con un leve toque de merquén ahumado.", p:4700},
+    {n:"E4 · Ceviche Roll", d:"Palta, queso crema, bañado en ceviche mixto de salmón, camarón, kanikama, cebolla morada, ciboulette y palta.", p:5000},
+    {n:"E5 · Beef Roll", d:"Carne, queso gauda, cebollín, envuelto en palta.", p:5200},
+    {n:"E6 · Hot Beef (roll apanado)", d:"Carne, queso gauda, cebollín.", p:5000},
+    {n:"E7 · Mechada Roll", d:"Carne mechada, queso crema, cebollín, envuelto en palta.", p:5200},
+    {n:"E8 · Hot Roll", d:"Camarón, queso crema, cebollín, envuelto en salmón cocido.", p:5200},
+    {n:"E9 · Tako Spicy", d:"Pulpo, queso crema, cebollín, salsa spicy, envuelto en salmón.", p:5300},
+    {n:"E10 · Cheese Nogado", d:"Pollo teriyaki, palta, cebollín, envuelto en queso crema, con pedazos de nueces.", p:4900},
+    {n:"E11 · Cheese especial (furay)", d:"Camarón furay, palta, cebollín, envuelto en queso crema con ciboulette.", p:5100},
+    {n:"E13 · Sake Hot", d:"Camarón, queso crema, cebollín, envuelto en salmón apanado.", p:5400},
+    {n:"E14 · Tempura Ebi", d:"5 camarones apanados.", p:4200},
+    {n:"E15 · Tempura Ebi Cheese", d:"5 camarones envueltos en queso crema y apanados.", p:4500},
+    {n:"E16 · Tory Furay", d:"5 unidades de pollo tempurizado.", p:3500},
+    {n:"E18 · Gohan pollo teriyaki", d:"Sushi al plato. Base de arroz con pollo, queso crema, palta, cebollín y sésamo.", p:3900},
+    {n:"E19 · Gohan salmón", d:"Sushi al plato. Base de arroz con salmón, queso crema, palta, cebollín y sésamo.", p:4300},
+    {n:"E20 · Gohan camarón", d:"Base de arroz con camarón, queso crema, palta, cebollín y sésamo.", p:4300},
+    {n:"E21 · Gohan mixto", d:"Base de arroz con salmón, camarón, queso crema, palta, cebollín y sésamo.", p:4700},
+    {n:"E22 · Futomaki especial (apanado)", d:"Camarón, palta, cebollín.", p:5300}
+  ]},
+
+  { cat:"California Rolls", nota:"10 piezas. Envuelto en sésamo, ciboulette o masago.", items:[
+    {n:"1 · California Cheese", d:"Palta, queso crema, cebollín", p:3200},
+    {n:"2 · California Light", d:"Palta, choclo, ciboulette, cebollín", p:3000},
+    {n:"3 · California Vegeta", d:"Palmito, choclo, queso crema, cebollín", p:2800},
+    {n:"4 · California Ebi", d:"Camarón, queso crema, cebollín", p:3700},
+    {n:"5 · California Sake", d:"Salmón, queso crema, cebollín", p:3800},
+    {n:"6 · California Champ.", d:"Champiñón, palta, cebollín", p:3700},
+    {n:"7 · California Tory", d:"Pollo teriyaki, queso crema, cebollín", p:3300},
+    {n:"8 · California Tako", d:"Pulpo, queso crema, cebollín", p:3800},
+    {n:"9 · California Tory Furai", d:"Pollo tempurizado, queso crema, cebollín", p:3400},
+    {n:"10 · California Kani", d:"Kanikama, queso crema, cebollín", p:2900},
+    {n:"11 · California Sake Furai", d:"Salmón tempurizado, queso crema, cebollín", p:3900}
+  ]},
+
+  { cat:"Hosomaki Rolls", nota:"10 piezas. Envuelto en alga nori.", items:[
+    {n:"12 · Maki Palmito", d:"Palmito, cebollín", p:1600},
+    {n:"13 · Maki Choclo", d:"Choclo, cebollín", p:1600},
+    {n:"14 · Maki Ebi", d:"Camarón, cebollín", p:2700},
+    {n:"15 · Maki Sake", d:"Salmón, cebollín", p:2700},
+    {n:"16 · Maki Champ", d:"Champiñón, cebollín", p:2700},
+    {n:"17 · Maki Tory", d:"Pollo, cebollín", p:2300},
+    {n:"18 · Maki Tako", d:"Pulpo, cebollín", p:2800},
+    {n:"19 · Maki Cheese", d:"Queso crema, cebollín", p:2100},
+    {n:"20 · Maki Kanikama", d:"Kanikama, cebollín", p:1800},
+    {n:"21 · Maki Palta", d:"Palta, cebollín", p:2000}
+  ]},
+
+  { cat:"Cheese Rolls", nota:"10 piezas. Envuelto en queso crema.", items:[
+    {n:"22 · Cheese Light", d:"Champiñón, palmito, cebollín", p:4300},
+    {n:"23 · Cheese Vegeta", d:"Palmito, choclo, palta, cebollín", p:4100},
+    {n:"24 · Cheese Ebi", d:"Camarón, palta, cebollín", p:4400},
+    {n:"25 · Cheese Sake", d:"Salmón, palta, cebollín", p:4700},
+    {n:"26 · Cheese Sake Especial", d:"Salmón, palta, queso crema, cebollín", p:4900},
+    {n:"27 · Cheese Tory", d:"Pollo teriyaki, palta, cebollín", p:4200},
+    {n:"28 · Cheese Tako", d:"Pulpo, palta, cebollín", p:4800},
+    {n:"29 · Cheese Tory Furai", d:"Pollo tempurizado, palta, cebollín", p:4500},
+    {n:"30 · Cheese Kani", d:"Kanikama, palta, cebollín", p:3900},
+    {n:"31 · Cheese Sake Furai", d:"Salmón tempurizado, palta, cebollín", p:4700}
+  ]},
+
+  { cat:"Avocado Rolls", nota:"10 piezas. Envueltos en palta.", items:[
+    {n:"32 · Avocado Light", d:"Champiñón, palmito, cebollín", p:4300},
+    {n:"33 · Avocado Vegeta", d:"Palmito, choclo, queso crema, cebollín", p:3800},
+    {n:"34 · Avocado Ebi", d:"Camarón, queso crema, cebollín", p:4300},
+    {n:"35 · Avocado Sake", d:"Salmón, queso crema, cebollín", p:4500},
+    {n:"36 · Avocado Ebi Tory", d:"Camarón, pollo teriyaki, queso crema, cebollín", p:4700},
+    {n:"37 · Avocado Tory", d:"Pollo teriyaki, queso crema, cebollín", p:3800},
+    {n:"38 · Avocado Tako", d:"Pulpo, queso crema, cebollín", p:4700},
+    {n:"39 · Avocado Tory Furai", d:"Pollo tempurizado, queso crema, cebollín", p:4200},
+    {n:"40 · Avocado Kani", d:"Kanikama, queso crema, cebollín", p:3700},
+    {n:"41 · Avocado Sake Furai", d:"Salmón tempurizado, queso crema, cebollín", p:4600}
+  ]},
+
+  { cat:"Tempura Rolls", nota:"10 piezas. Envueltos en panko y tempura (fritos).", items:[
+    {n:"42 · Tempura Light", d:"Palmito, queso crema, cebollín", p:3900},
+    {n:"43 · Tempura Vegeta", d:"Champiñón, queso crema, cebollín", p:4200},
+    {n:"44 · Tempura Ebi", d:"Camarón, queso crema, cebollín", p:4200},
+    {n:"45 · Tempura Sake", d:"Salmón, queso crema, cebollín", p:4400},
+    {n:"46 · Tempura Cheese", d:"Salmón, queso gauda, cebollín", p:4500},
+    {n:"47 · Tempura Tory", d:"Pollo teriyaki, queso crema, cebollín", p:4000},
+    {n:"48 · Tempura Tako", d:"Pulpo, queso crema, cebollín", p:4700},
+    {n:"49 · Tempura Tory Furai", d:"Pollo tempurizado, queso crema, cebollín", p:4300},
+    {n:"50 · Tempura Kanikama", d:"Kanikama, queso crema, cebollín, frito", p:3900},
+    {n:"51 · Tempura Sake Furai", d:"Salmón tempurizado, queso crema, cebollín", p:4800}
+  ]},
+
+  { cat:"Sake Rolls", nota:"10 piezas. Envueltos en salmón.", items:[
+    {n:"52 · Sake Light", d:"Champiñón, palmito, cebollín", p:4300},
+    {n:"53 · Sake Cheese", d:"Palta, queso crema, cebollín", p:4000},
+    {n:"54 · Sake Ebi", d:"Camarón, queso crema, cebollín", p:4400},
+    {n:"55 · Sake Ebi Furai", d:"Camarón tempurizado, queso crema, cebollín", p:4500},
+    {n:"56 · Sake Vegeta", d:"Palmito, choclo, queso crema, cebollín", p:3900},
+    {n:"57 · Sake Tory", d:"Pollo teriyaki, queso crema, cebollín", p:4100},
+    {n:"58 · Sake Tako", d:"Pulpo, queso crema, cebollín", p:4800},
+    {n:"59 · Sake Tory Furai", d:"Pollo tempurizado, queso crema, cebollín", p:4200},
+    {n:"60 · Sake Kani", d:"Kanikama, queso crema, cebollín", p:3800},
+    {n:"61 · Sake Avocado Ebi", d:"Camarón, palta, cebollín", p:4200}
+  ]},
+
+  { cat:"Futomaki", nota:"Rolls envueltos en alga nori.", items:[
+    {n:"62 · Futomaki Tory", d:"Pollo teriyaki, queso crema, palta, cebollín", p:4200},
+    {n:"63 · Futomaki Ebi Furai", d:"Camarón tempurizado, queso crema, palta, cebollín", p:4600},
+    {n:"64 · Futomaki Sake", d:"Salmón, queso crema, palta, cebollín", p:4400}
+  ]},
+
+  { cat:"Rolls veganos", items:[
+    {n:"65 · Vegano tempura", d:"Champiñón, palta, pimentón, envuelto en tempura (frito)", p:4900},
+    {n:"66 · Vegano seitán", d:"Seitán, palta, cebollín, envuelto en sésamo o ciboulette", p:4600},
+    {n:"67 · Vegano palta", d:"Champiñón, palmito, ciboulette, envuelto en palta", p:4800}
+  ]},
+
+  { cat:"Temaki", nota:"Cono de alga con arroz + ingredientes.", items:[
+    {n:"T1 · Temaki Ebi Furai", d:"Camarón tempurizado, queso crema, palta, cebollín", p:4200},
+    {n:"T2 · Temaki Tory", d:"Pollo teriyaki, queso crema, palta, cebollín", p:3800},
+    {n:"T3 · Temaki Vegeta 1", d:"Palmito, queso crema, palta, cebollín, pimentón", p:3500},
+    {n:"T4 · Temaki Vegeta 2", d:"Choclo, queso crema, palta, cebollín, pimentón", p:3500},
+    {n:"T5 · Temaki Tako", d:"Pulpo, queso crema, palta, cebollín", p:4200}
+  ]},
+
+  { cat:"Nigiri y Sashimi", nota:"Nigiri: 2 unidades.", items:[
+    {n:"N1 · Nigiri Sake", d:"Bolitas de arroz cubiertas de salmón", p:3000},
+    {n:"N2 · Nigiri Ebi", d:"Bolitas de arroz cubiertas de camarón", p:3000},
+    {n:"N3 · Nigiri Tako Spicy", d:"Bolitas de arroz cubiertas de pulpo y bañadas en salsa spicy", p:3200},
+    {n:"N4 · Nigiri Masago", d:"Bolitas de arroz cubiertas de masago", p:2600},
+    {n:"Sashimi", d:"5 cortes", p:4500}
+  ]},
+
+  { cat:"Entradas y salsas", items:[
+    {n:"Gyozas (5 unidades)", d:"Cerdo, camarón, pollo, champiñón-queso crema o verduras", p:3000},
+    {n:"Ceviche estilo peruano", d:"Pescado blanco, salmón, palta, ciboulette, pimentón, cebolla morada", p:6000},
+    {n:"Salsa acevichada", d:"", p:1200},
+    {n:"Salsa spicy", d:"Salsa picante", p:1000}
+  ]},
+
+  { cat:"Arma tu roll", nota:"Elige una BASE, los RELLENOS que quieras y una ENVOLTURA. Se suman los precios.", items:[
+    {n:"Base A · Arroz + Nori", d:"", p:1000},
+    {n:"Base B · Sin arroz", d:"", p:1400},
+    {n:"Base C · Sin alga", d:"", p:1200},
+    {n:"Base D · En alga (futomaki)", d:"", p:1200},
+    {n:"Base E · Base Gohan", d:"", p:1800},
+    {n:"Relleno A1 · Pollo", d:"", p:1000},
+    {n:"Relleno A2 · Salmón", d:"", p:1500},
+    {n:"Relleno A3 · Camarón", d:"", p:1500},
+    {n:"Relleno A4 · Pulpo", d:"", p:1700},
+    {n:"Relleno A5 · Palta", d:"", p:800},
+    {n:"Relleno A6 · Carne", d:"", p:1200},
+    {n:"Relleno A7 · Queso crema", d:"", p:800},
+    {n:"Relleno A8 · Champiñón", d:"", p:1500},
+    {n:"Relleno A9 · Tempurizado", d:"", p:400},
+    {n:"Relleno B10 · Cebollín", d:"", p:300},
+    {n:"Relleno B11 · Pimentón", d:"", p:500},
+    {n:"Relleno B12 · Ciboulette", d:"", p:300},
+    {n:"Relleno B13 · Pepino", d:"", p:500},
+    {n:"Relleno B14 · Zanahoria", d:"", p:500},
+    {n:"Relleno B15 · Choclo", d:"", p:900},
+    {n:"Relleno B16 · Palmito", d:"", p:900},
+    {n:"Envoltura C15 · Tempura", d:"", p:1200},
+    {n:"Envoltura C16 · Queso crema", d:"", p:1000},
+    {n:"Envoltura C17 · Palta", d:"", p:1000},
+    {n:"Envoltura C18 · Sésamo o ciboulette", d:"", p:800},
+    {n:"Envoltura C19 · Massago", d:"", p:900},
+    {n:"Envoltura C20 · Salmón", d:"", p:1200},
+    {n:"Envoltura C21 · Amapola", d:"", p:900},
+    {n:"Envoltura C22 · Rainbow", d:"", p:1400}
+  ]}
+];
+
+/* ============================================================
+   De aca para abajo no necesitas tocar nada.
+   ============================================================ */
+function clp(n){ return "$" + n.toLocaleString("es-CL"); }
+function slug(s){
+  return s.toLowerCase()
+          .normalize("NFD").replace(/[̀-ͯ]/g, "")
+          .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+var cart = {};
+var modo = "Delivery";
+
+var tabsEl = document.getElementById("tabs");
+var menuEl = document.getElementById("menu");
+
+CARTA.forEach(function(c, ci){
+  var id = "c-" + slug(c.cat);
+
+  var t = document.createElement("button");
+  t.className = "tab" + (ci === 0 ? " on" : "");
+  t.textContent = c.cat;
+  t.dataset.target = id;
+  tabsEl.appendChild(t);
+
+  var sec = document.createElement("div");
+  sec.className = "cat";
+  sec.id = id;
+
+  var h = document.createElement("h3");
+  h.className = "display";
+  h.textContent = c.cat;
+  sec.appendChild(h);
+
+  if (c.nota) {
+    var p = document.createElement("p");
+    p.className = "cat-note";
+    p.textContent = c.nota;
+    sec.appendChild(p);
+  }
+
+  var grid = document.createElement("div");
+  grid.className = "items";
+
+  c.items.forEach(function(it, ii){
+    var key = ci + "-" + ii;
+
+    var el = document.createElement("div");
+    el.className = "item";
+
+    var top = document.createElement("div");
+    top.className = "item-top";
+    var h4 = document.createElement("h4"); h4.textContent = it.n;
+    var pr = document.createElement("span"); pr.className = "price"; pr.textContent = clp(it.p);
+    top.append(h4, pr);
+    el.appendChild(top);
+
+    if (it.d) {
+      var d = document.createElement("p");
+      d.className = "desc";
+      d.textContent = it.d;
+      el.appendChild(d);
+    }
+
+    var foot = document.createElement("div");
+    foot.className = "item-foot";
+    foot.dataset.key = key;
+    if (it.tag) {
+      var tg = document.createElement("span");
+      tg.className = "tag";
+      tg.textContent = it.tag;
+      foot.appendChild(tg);
+    }
+    el.appendChild(foot);
+    grid.appendChild(el);
+  });
+
+  sec.appendChild(grid);
+  menuEl.appendChild(sec);
+
+  // los controles se crean una vez que la seccion ya esta en el documento
+  c.items.forEach(function(it, ii){ refreshControl(ci + "-" + ii, it); });
+});
+
+function refreshControl(key, it){
+  var foot = document.querySelector('.item-foot[data-key="' + key + '"]');
+  if (!foot) return;
+  var old = foot.querySelector(".add, .qty");
+  if (old) old.remove();
+
+  if (!cart[key]) {
+    var b = document.createElement("button");
+    b.className = "add";
+    b.textContent = "Agregar";
+    b.onclick = function(){ addItem(key, it); refreshControl(key, it); };
+    foot.appendChild(b);
+    return;
+  }
+
+  var q = document.createElement("div");
+  q.className = "qty";
+  var minus = document.createElement("button"); minus.textContent = "−";
+  var num   = document.createElement("span");   num.textContent = cart[key].q;
+  var plus  = document.createElement("button"); plus.textContent = "+";
+  minus.onclick = function(){ changeQty(key, -1); refreshControl(key, it); renderLines(); };
+  plus.onclick  = function(){ changeQty(key,  1); refreshControl(key, it); renderLines(); };
+  q.append(minus, num, plus);
+  foot.appendChild(q);
+}
+
+function addItem(key, it){
+  if (!cart[key]) cart[key] = { n: it.n, p: it.p, q: 0, ref: it };
+  cart[key].q++;
+  updateBar();
+}
+function changeQty(key, d){
+  if (!cart[key]) return;
+  cart[key].q += d;
+  if (cart[key].q <= 0) delete cart[key];
+  updateBar();
+}
+
+tabsEl.addEventListener("click", function(e){
+  var t = e.target.closest(".tab");
+  if (!t) return;
+  var target = document.getElementById(t.dataset.target);
+  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+if ("IntersectionObserver" in window) {
+  var obs = new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      if (!en.isIntersecting) return;
+      var tabs = document.querySelectorAll(".tab");
+      for (var i = 0; i < tabs.length; i++) {
+        tabs[i].classList.toggle("on", tabs[i].dataset.target === en.target.id);
+      }
+    });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+  document.querySelectorAll(".cat").forEach(function(s){ obs.observe(s); });
+}
+
+var bar = document.getElementById("bar");
+function totals(){
+  var n = 0, t = 0;
+  for (var k in cart) { n += cart[k].q; t += cart[k].q * cart[k].p; }
+  return { n: n, t: t };
+}
+function updateBar(){
+  var r = totals();
+  document.getElementById("barCount").textContent = r.n;
+  document.getElementById("barTotal").textContent = clp(r.t);
+  document.getElementById("mTotal").textContent = clp(r.t);
+  bar.classList.toggle("show", r.n > 0);
+}
+
+var modal   = document.getElementById("modal");
+var linesEl = document.getElementById("lines");
+
+function renderLines(){
+  linesEl.innerHTML = "";
+  var keys = Object.keys(cart);
+  if (!keys.length) {
+    var e = document.createElement("p");
+    e.className = "empty";
+    e.textContent = "Tu pedido está vacío.";
+    linesEl.appendChild(e);
+    return;
+  }
+  keys.forEach(function(k){
+    var it = cart[k];
+
+    var row = document.createElement("div");
+    row.className = "line";
+
+    var ln = document.createElement("div");
+    ln.className = "ln";
+    var b = document.createElement("b"); b.textContent = it.n;
+    var s = document.createElement("small"); s.textContent = it.q + " × " + clp(it.p);
+    ln.append(b, s);
+
+    var q = document.createElement("div");
+    q.className = "qty";
+    var m  = document.createElement("button"); m.textContent = "−";
+    var nn = document.createElement("span");   nn.textContent = it.q;
+    var p  = document.createElement("button"); p.textContent = "+";
+    m.onclick = function(){ changeQty(k, -1); refreshControl(k, it.ref); renderLines(); };
+    p.onclick = function(){ changeQty(k,  1); refreshControl(k, it.ref); renderLines(); };
+    q.append(m, nn, p);
+
+    var lp = document.createElement("span");
+    lp.className = "lp";
+    lp.textContent = clp(it.q * it.p);
+
+    row.append(ln, q, lp);
+    linesEl.appendChild(row);
+  });
+}
+
+function openModal(){ renderLines(); modal.classList.add("show"); document.body.style.overflow = "hidden"; }
+function closeModal(){ modal.classList.remove("show"); document.body.style.overflow = ""; }
+
+document.getElementById("barOpen").onclick = openModal;
+document.getElementById("barGo").onclick   = openModal;
+document.getElementById("close").onclick   = closeModal;
+modal.addEventListener("click", function(e){ if (e.target === modal) closeModal(); });
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeModal(); });
+
+document.getElementById("modo").addEventListener("click", function(e){
+  var b = e.target.closest("button");
+  if (!b) return;
+  document.querySelectorAll("#modo button").forEach(function(x){ x.classList.remove("on"); });
+  b.classList.add("on");
+  modo = b.dataset.m;
+  var esDelivery = (modo === "Delivery");
+  document.getElementById("fDir").style.display    = esDelivery ? "" : "none";
+  document.getElementById("nodeliv").style.display = esDelivery ? "" : "none";
+});
+
+document.getElementById("send").onclick = function(){
+  var keys = Object.keys(cart);
+  if (!keys.length) { alert("Agrega al menos un producto a tu pedido."); return; }
+
+  var nombre = document.getElementById("nombre").value.trim();
+  var dir    = document.getElementById("direccion").value.trim();
+  var nota   = document.getElementById("nota").value.trim();
+
+  if (!nombre) { alert("Escribe tu nombre para el pedido."); document.getElementById("nombre").focus(); return; }
+  if (modo === "Delivery" && !dir) { alert("Escribe la dirección de entrega."); document.getElementById("direccion").focus(); return; }
+
+  var L = [];
+  L.push("*NUEVO PEDIDO - VIVA SUSHI*");
+  L.push("");
+  keys.forEach(function(k){
+    var it = cart[k];
+    L.push("• " + it.q + "x " + it.n + " - " + clp(it.q * it.p));
+  });
+  L.push("");
+  L.push("*Total productos: " + clp(totals().t) + "*");
+  if (modo === "Delivery") L.push("_(no incluye despacho)_");
+  L.push("");
+  L.push("Nombre: " + nombre);
+  L.push("Modalidad: " + modo);
+  if (modo === "Delivery") {
+    L.push("Dirección: " + dir);
+    L.push("Por favor confírmenme el costo del despacho.");
+  }
+  if (nota) L.push("Comentario: " + nota);
+  L.push("");
+  L.push("_Pedido enviado desde la página web_");
+
+  window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(L.join("\n")), "_blank");
+};
+
+updateBar();
+</script>
+</body>
+</html>
