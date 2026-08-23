@@ -1,7 +1,9 @@
 # Viva Sushi — Página de pedidos
 
-Página web de pedidos para **Viva Sushi Delivery** (San Ramón y La Granja, Santiago de Chile).
+Página web de pedidos para **Viva Sushi** (San Ramón, Santiago de Chile).
 El cliente arma su pedido y lo envía por WhatsApp con el detalle ya escrito.
+
+> **No hay delivery.** El local atiende solo para servir en el local o para llevar.
 
 🔗 **WhatsApp:** [+56 9 9788 7871](https://wa.me/56997887871)
 📍 **Dirección:** Santa Rosa #8689, San Ramón
@@ -13,9 +15,8 @@ El cliente arma su pedido y lo envía por WhatsApp con el detalle ya escrito.
 
 - Carta completa navegable por categorías (145 productos).
 - Carrito con cantidades y total en vivo.
-- Elección de modalidad: **Delivery**, **Retiro en local** o **Para servir**.
-- Al enviar, abre WhatsApp con el pedido completo redactado: productos, cantidades, total, nombre, dirección y comentarios.
-- El total de productos **no incluye el despacho** — se avisa en pantalla y en el mensaje.
+- Elección de modalidad: **Para llevar** o **Para servir**.
+- Al enviar, abre WhatsApp con el pedido completo redactado: productos, cantidades, total, nombre y comentarios.
 - Enlaces a Instagram, Facebook y Google Maps.
 
 ## Cómo funciona
@@ -56,4 +57,3 @@ Nigiri y Sashimi · Entradas y salsas · Arma tu roll
 - [ ] Confirmar precios de **California Sake** (#5) y **California Tako** (#8) — la foto de la carta no permitía distinguir entre `$3.600` y `$3.800`.
 - [ ] Definir si existen los productos **E12** y **E17** (la carta salta de E11 a E13 y de E16 a E18).
 - [ ] Agregar sección de bebidas si corresponde.
-- [ ] Opcional: cobrar el despacho automáticamente por sector en vez de confirmarlo por chat.

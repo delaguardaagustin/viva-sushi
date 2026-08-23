@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Viva Sushi — Delivery San Ramón y La Granja</title>
-<meta name="description" content="Viva Sushi Delivery. Santa Rosa #8689, San Ramón. Pide por WhatsApp: para servir, llevar o delivery en San Ramón y La Granja.">
+<title>Viva Sushi — San Ramón</title>
+<meta name="description" content="Viva Sushi. Santa Rosa #8689, San Ramón. Pide por WhatsApp para servir en el local o para llevar.">
 <meta name="theme-color" content="#0d0b0c">
-<meta property="og:title" content="Viva Sushi — Delivery San Ramón y La Granja">
+<meta property="og:title" content="Viva Sushi — San Ramón">
 <meta property="og:description" content="Pide tu sushi por WhatsApp. Santa Rosa #8689, San Ramón.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -230,11 +230,6 @@ section{scroll-margin-top:70px}
 .sheet .btn{width:100%;margin-top:18px}
 .empty{text-align:center;color:var(--txt2);padding:26px 0;font-size:14px}
 .aviso{font-size:12px;color:var(--txt2);text-align:center;margin-top:11px;line-height:1.5}
-.nodeliv{
-  font-size:12.5px;line-height:1.5;color:var(--oro);background:rgba(232,180,74,.08);
-  border:1px solid rgba(232,180,74,.28);border-radius:11px;padding:9px 12px;margin-top:4px;
-}
-.nodeliv b{color:var(--oro)}
 
 /* ---------- FOOTER ---------- */
 footer{border-top:1px solid var(--line);padding:34px 0;text-align:center;color:var(--txt2);font-size:13px}
@@ -257,9 +252,9 @@ footer a{color:var(--txt2)}
 
 <div class="hero">
   <div class="wrap">
-    <span class="kicker">Delivery · San Ramón y La Granja</span>
+    <span class="kicker">Sushi artesanal · San Ramón</span>
     <h1 class="display">VIVA<br><span>SUSHI</span></h1>
-    <p class="sub">Puedes pedir <b>para servir</b>, <b>para llevar</b> o <b>delivery</b>. Arma tu pedido acá abajo y te lo enviamos directo por WhatsApp.</p>
+    <p class="sub">Pide <b>para servir</b> en el local o <b>para llevar</b>. Arma tu pedido acá abajo y te lo enviamos directo por WhatsApp.</p>
     <div class="cta-row">
       <a class="btn btn-wa" href="#carta">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
@@ -284,9 +279,9 @@ footer a{color:var(--txt2)}
         <p>Martes a Sábado<small>13:00 a 22:00 hrs · Lunes cerrado</small></p>
       </div>
       <div class="info-card">
-        <div class="ic">🛵</div>
-        <h3>Reparto</h3>
-        <p>San Ramón y La Granja<small>El despacho tiene costo adicional según sector. También para servir o para llevar.</small></p>
+        <div class="ic">🥡</div>
+        <h3>Modalidades</h3>
+        <p>Para servir o para llevar<small>Atención en el local. No contamos con delivery.</small></p>
       </div>
       <div class="info-card">
         <div class="ic">💳</div>
@@ -365,18 +360,15 @@ footer a{color:var(--txt2)}
     </div>
     <div id="lines"></div>
     <div class="total"><span>Total</span><span class="tv" id="mTotal">$0</span></div>
-    <p class="nodeliv" id="nodeliv">🛵 El total <b>no incluye el despacho</b>. El costo se confirma por WhatsApp según tu sector.</p>
 
     <div class="field">
       <label>¿Cómo lo quieres?</label>
       <div class="seg" id="modo">
-        <button class="on" data-m="Delivery">🛵 Delivery</button>
-        <button data-m="Retiro en local">🥡 Retiro</button>
-        <button data-m="Para servir">🍽️ Servir</button>
+        <button class="on" data-m="Para llevar">🥡 Para llevar</button>
+        <button data-m="Para servir">🍽️ Para servir</button>
       </div>
     </div>
     <div class="field"><label>Tu nombre</label><input id="nombre" placeholder="Ej: Camila Rojas" autocomplete="name"></div>
-    <div class="field" id="fDir"><label>Dirección de entrega</label><input id="direccion" placeholder="Calle, número, depto — comuna" autocomplete="street-address"></div>
     <div class="field"><label>Comentarios (opcional)</label><textarea id="nota" placeholder="Sin palta, salsa extra, tocar el timbre..."></textarea></div>
 
     <button class="btn btn-wa" id="send">
@@ -599,7 +591,7 @@ function slug(s){
 }
 
 var cart = {};
-var modo = "Delivery";
+var modo = "Para llevar";
 
 var tabsEl = document.getElementById("tabs");
 var menuEl = document.getElementById("menu");
@@ -802,9 +794,6 @@ document.getElementById("modo").addEventListener("click", function(e){
   document.querySelectorAll("#modo button").forEach(function(x){ x.classList.remove("on"); });
   b.classList.add("on");
   modo = b.dataset.m;
-  var esDelivery = (modo === "Delivery");
-  document.getElementById("fDir").style.display    = esDelivery ? "" : "none";
-  document.getElementById("nodeliv").style.display = esDelivery ? "" : "none";
 });
 
 document.getElementById("send").onclick = function(){
@@ -812,11 +801,9 @@ document.getElementById("send").onclick = function(){
   if (!keys.length) { alert("Agrega al menos un producto a tu pedido."); return; }
 
   var nombre = document.getElementById("nombre").value.trim();
-  var dir    = document.getElementById("direccion").value.trim();
   var nota   = document.getElementById("nota").value.trim();
 
   if (!nombre) { alert("Escribe tu nombre para el pedido."); document.getElementById("nombre").focus(); return; }
-  if (modo === "Delivery" && !dir) { alert("Escribe la dirección de entrega."); document.getElementById("direccion").focus(); return; }
 
   var L = [];
   L.push("*NUEVO PEDIDO - VIVA SUSHI*");
@@ -826,15 +813,10 @@ document.getElementById("send").onclick = function(){
     L.push("• " + it.q + "x " + it.n + " - " + clp(it.q * it.p));
   });
   L.push("");
-  L.push("*Total productos: " + clp(totals().t) + "*");
-  if (modo === "Delivery") L.push("_(no incluye despacho)_");
+  L.push("*Total: " + clp(totals().t) + "*");
   L.push("");
   L.push("Nombre: " + nombre);
   L.push("Modalidad: " + modo);
-  if (modo === "Delivery") {
-    L.push("Dirección: " + dir);
-    L.push("Por favor confírmenme el costo del despacho.");
-  }
   if (nota) L.push("Comentario: " + nota);
   L.push("");
   L.push("_Pedido enviado desde la página web_");
