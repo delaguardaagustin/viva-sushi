@@ -21,8 +21,9 @@ El cliente arma su pedido y lo envía por WhatsApp con el detalle ya escrito.
 
 ## Cómo funciona
 
-Es un único archivo `index.html`, sin dependencias, sin build y sin backend.
-Se abre directo en el navegador o se sube a cualquier hosting estático.
+`index.html` sin dependencias, sin build y sin backend, más la carpeta `assets/`
+con el logo y las fotos de los rolls (recortadas de la carta oficial del local).
+Se sube tal cual a cualquier hosting estático.
 
 ## Cómo editar la carta
 
