@@ -310,12 +310,18 @@ section{scroll-margin-top:74px}
 .total .tv{font-family:'Bebas Neue',sans-serif;font-size:33px;color:var(--oro);line-height:1}
 .field{margin-top:15px}
 .field label{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--oro);margin-bottom:8px;font-weight:700}
-.field input,.field textarea{
+.field input,.field textarea,.field select{
   width:100%;background:#000;border:1px solid var(--line2);border-radius:12px;
   padding:13px 15px;color:var(--txt);font-family:inherit;font-size:15px;transition:border-color .18s;
 }
-.field input:focus,.field textarea:focus{outline:none;border-color:var(--rojo)}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--rojo)}
 .field textarea{resize:vertical;min-height:64px}
+.field select{
+  -webkit-appearance:none;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a49a95' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 15px center;padding-right:38px;
+}
+.field .opt{text-transform:none;letter-spacing:0;color:var(--txt2);font-weight:400}
 .seg{display:flex;gap:8px}
 .seg button{
   flex:1;padding:13px 8px;border-radius:12px;border:1px solid var(--line2);background:#000;
@@ -492,6 +498,21 @@ footer .sep{color:var(--line2);margin:0 8px}
       </div>
     </div>
     <div class="field"><label>Tu nombre</label><input id="nombre" placeholder="Ej: Camila Rojas" autocomplete="name"></div>
+    <div class="field"><label>Número de contacto</label><input id="contacto" type="tel" inputmode="tel" placeholder="+56 9 1234 5678" autocomplete="tel"></div>
+    <div class="field"><label>Dirección <span class="opt">(solo si es despacho)</span></label><input id="direccion" placeholder="Calle y número, depto, comuna" autocomplete="street-address"></div>
+    <div class="field"><label>Salsas</label><input id="salsas" placeholder="Ej: 2 soya, 1 acevichada, 1 spicy"></div>
+    <div class="field"><label>Palitos</label><input id="palitos" type="number" min="0" inputmode="numeric" placeholder="¿Cuántos pares?"></div>
+    <div class="field"><label>Medio de pago</label>
+      <select id="pago">
+        <option value="">Selecciona…</option>
+        <option>Efectivo</option>
+        <option>Débito</option>
+        <option>Crédito</option>
+        <option>Transferencia</option>
+        <option>Pluxee</option>
+        <option>Edenred</option>
+      </select>
+    </div>
     <div class="field"><label>Comentarios (opcional)</label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00..."></textarea></div>
 
     <button class="btn btn-wa" id="send">
@@ -967,10 +988,17 @@ document.getElementById("send").onclick = function(){
   var keys = Object.keys(cart);
   if (!keys.length) { alert("Agrega al menos un producto a tu pedido."); return; }
 
-  var nombre = document.getElementById("nombre").value.trim();
-  var nota   = document.getElementById("nota").value.trim();
+  var nombre    = document.getElementById("nombre").value.trim();
+  var contacto  = document.getElementById("contacto").value.trim();
+  var direccion = document.getElementById("direccion").value.trim();
+  var salsas    = document.getElementById("salsas").value.trim();
+  var palitos   = document.getElementById("palitos").value.trim();
+  var pago      = document.getElementById("pago").value;
+  var nota      = document.getElementById("nota").value.trim();
 
-  if (!nombre) { alert("Escribe tu nombre para el pedido."); document.getElementById("nombre").focus(); return; }
+  if (!nombre)   { alert("Escribe tu nombre para el pedido."); document.getElementById("nombre").focus(); return; }
+  if (!contacto) { alert("Escribe un número de contacto."); document.getElementById("contacto").focus(); return; }
+  if (!pago)     { alert("Elige un medio de pago."); document.getElementById("pago").focus(); return; }
 
   var L = [];
   L.push("*NUEVO PEDIDO - VIVA SUSHI*");
@@ -983,7 +1011,12 @@ document.getElementById("send").onclick = function(){
   L.push("*Total: " + clp(totals().t) + "*");
   L.push("");
   L.push("Nombre: " + nombre);
+  L.push("Contacto: " + contacto);
   L.push("Modalidad: " + modo);
+  if (direccion) L.push("Dirección: " + direccion);
+  L.push("Salsas: " + (salsas || "—"));
+  L.push("Palitos: " + (palitos ? palitos + " par(es)" : "—"));
+  L.push("Medio de pago: " + pago);
   if (nota) L.push("Comentario: " + nota);
   L.push("");
   L.push("_Pedido enviado desde la página web_");
