@@ -515,7 +515,7 @@ footer .sep{color:var(--line2);margin:0 8px}
     </div>
     <div class="field"><label>Comentarios (opcional)</label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00..."></textarea></div>
 
-    <button class="btn btn-wa" id="send">
+    <button type="button" class="btn btn-wa" id="send">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
       Enviar pedido por WhatsApp
     </button>
@@ -1021,7 +1021,12 @@ document.getElementById("send").onclick = function(){
   L.push("");
   L.push("_Pedido enviado desde la página web_");
 
-  window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(L.join("\n")), "_blank");
+  var url = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(L.join("\n"));
+  var win = window.open(url, "_blank");
+  if (!win || win.closed || typeof win.closed === "undefined") {
+    // el navegador bloqueó la pestaña nueva (típico en móvil): abrir en la misma
+    window.location.href = url;
+  }
 };
 
 updateBar();
