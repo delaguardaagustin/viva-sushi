@@ -340,7 +340,8 @@ section{scroll-margin-top:74px}
   color:var(--txt);display:flex;align-items:center;gap:9px;margin-bottom:2px;
 }
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-@media(max-width:400px){.grid2{grid-template-columns:1fr}}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+@media(max-width:400px){.grid2,.grid3{grid-template-columns:1fr}}
 .field select.num{
   text-align:center;text-align-last:center;font-weight:800;font-size:16px;
   padding-right:34px;background-position:right 13px center;
@@ -526,11 +527,11 @@ footer .sep{color:var(--line2);margin:0 8px}
           <button type="button" data-m="Para servir">🍽️ Para servir</button>
         </div>
       </div>
-      <div class="grid2">
-        <div class="field"><label>Salsas</label><select id="salsas" class="num"></select></div>
+      <div class="grid3">
+        <div class="field"><label>Salsa soya</label><select id="salsaSoya" class="num"></select></div>
+        <div class="field"><label>Salsa dulce</label><select id="salsaDulce" class="num"></select></div>
         <div class="field"><label>Palitos <span class="opt">(pares)</span></label><select id="palitos" class="num"></select></div>
       </div>
-      <div class="field"><label>¿Qué salsas? <span class="opt">(opcional)</span></label><input id="salsastipo" placeholder="Soya, acevichada, spicy…"></div>
     </div>
 
     <div class="fsec">
@@ -1019,7 +1020,7 @@ document.getElementById("modo").addEventListener("click", function(e){
 });
 
 /* opciones 0 a 10 para salsas y palitos */
-["salsas", "palitos"].forEach(function(id){
+["salsaSoya", "salsaDulce", "palitos"].forEach(function(id){
   var sel = document.getElementById(id);
   for (var i = 0; i <= 10; i++) {
     var o = document.createElement("option");
@@ -1045,9 +1046,13 @@ document.getElementById("send").onclick = function(){
   var nombre     = document.getElementById("nombre").value.trim();
   var contacto   = document.getElementById("contacto").value.trim();
   var direccion  = document.getElementById("direccion").value.trim();
-  var salsas     = document.getElementById("salsas").value;
-  var salsastipo = document.getElementById("salsastipo").value.trim();
+  var soya       = +document.getElementById("salsaSoya").value;
+  var dulce      = +document.getElementById("salsaDulce").value;
   var palitos    = document.getElementById("palitos").value;
+  var salsasParts = [];
+  if (soya)  salsasParts.push(soya + " soya");
+  if (dulce) salsasParts.push(dulce + " dulce");
+  var salsasTxt = salsasParts.length ? salsasParts.join(", ") : "0";
   var nota       = document.getElementById("nota").value.trim();
 
   if (!nombre)   { alert("Escribe tu nombre para el pedido."); document.getElementById("nombre").focus(); return; }
@@ -1068,7 +1073,7 @@ document.getElementById("send").onclick = function(){
   L.push("Contacto: " + contacto);
   L.push("Modalidad: " + modo);
   if (direccion) L.push("Dirección: " + direccion);
-  L.push("Salsas: " + salsas + (salsastipo ? " (" + salsastipo + ")" : ""));
+  L.push("Salsas: " + salsasTxt);
   L.push("Palitos: " + palitos + " par(es)");
   L.push("Medio de pago: " + pago);
   if (nota) L.push("Comentario: " + nota);
