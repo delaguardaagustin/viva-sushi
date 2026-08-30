@@ -331,6 +331,7 @@ section{scroll-margin-top:74px}
 .seg button.on{background:var(--rojo);border-color:var(--rojo);color:#fff;box-shadow:0 6px 18px rgba(224,42,53,.3)}
 .seg-wrap{flex-wrap:wrap}
 .seg-wrap button{flex:1 1 28%;min-width:94px;padding:12px 6px;font-size:13px}
+@media(max-width:360px){.seg-wrap button{flex-basis:45%;min-width:0;font-size:12.5px}}
 
 /* secciones del formulario */
 .fsec{margin-top:20px;padding-top:17px;border-top:1px solid var(--line)}
@@ -341,6 +342,10 @@ section{scroll-margin-top:74px}
 }
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+@media(max-width:520px){
+  .grid3{grid-template-columns:1fr 1fr}
+  .grid3 .field:last-child{grid-column:1 / -1}
+}
 @media(max-width:400px){.grid2,.grid3{grid-template-columns:1fr}}
 .field select.num{
   text-align:center;text-align-last:center;font-weight:800;font-size:16px;
