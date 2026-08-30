@@ -355,9 +355,14 @@ section{scroll-margin-top:74px}
 .sheet .btn{width:100%;margin-top:22px}
 .empty{text-align:center;color:var(--txt2);padding:28px 0;font-size:14px}
 .aviso{font-size:12px;color:var(--txt2);text-align:center;margin-top:12px;line-height:1.55}
-.err{display:none;margin-top:12px;padding:11px 14px;border-radius:11px;font-size:13.5px;font-weight:600;
-  text-align:center;color:#ffd7d7;background:rgba(224,42,53,.16);border:1px solid rgba(224,42,53,.45)}
-.err.show{display:block}
+.err{display:none;margin-top:16px;padding:12px 15px;border-radius:12px;font-size:14px;font-weight:700;
+  text-align:center;color:#fff;background:var(--rojo);border:1px solid var(--rojo);
+  box-shadow:0 8px 22px rgba(224,42,53,.35)}
+.err.show{display:block;animation:errpop .28s ease}
+@keyframes errpop{from{transform:translateY(-6px);opacity:0}to{transform:none;opacity:1}}
+.req{color:var(--rojo);font-weight:800}
+.field-bad{outline:2px solid var(--rojo);outline-offset:2px;border-radius:12px}
+input.field-bad{outline:none;border-color:var(--rojo)}
 
 /* ---------- FOOTER ---------- */
 footer{position:relative;border-top:1px solid var(--line);padding:44px 0 38px;text-align:center;color:var(--txt2);font-size:13.5px;overflow:hidden}
@@ -520,8 +525,8 @@ footer .sep{color:var(--line2);margin:0 8px}
     <div class="fsec">
       <div class="fsec-h">🧾 Tus datos</div>
       <div class="grid2">
-        <div class="field"><label>Nombre</label><input id="nombre" placeholder="Camila Rojas" autocomplete="name"></div>
-        <div class="field"><label>Contacto</label><input id="contacto" type="tel" inputmode="tel" placeholder="+56 9 1234 5678" autocomplete="tel"></div>
+        <div class="field"><label>Nombre <span class="req">*</span></label><input id="nombre" placeholder="Camila Rojas" autocomplete="name"></div>
+        <div class="field"><label>Contacto <span class="req">*</span></label><input id="contacto" type="tel" inputmode="tel" placeholder="+56 9 1234 5678" autocomplete="tel"></div>
       </div>
       <div class="field"><label>Dirección <span class="opt">(solo si es despacho)</span></label><input id="direccion" placeholder="Calle y número, depto, comuna" autocomplete="street-address"></div>
     </div>
@@ -545,7 +550,7 @@ footer .sep{color:var(--line2);margin:0 8px}
     <div class="fsec">
       <div class="fsec-h">💳 Pago</div>
       <div class="field">
-        <label>Medio de pago</label>
+        <label>Medio de pago <span class="req">*</span></label>
         <div class="seg seg-wrap" id="pago">
           <button type="button" data-v="Efectivo">Efectivo</button>
           <button type="button" data-v="Débito">Débito</button>
@@ -558,11 +563,11 @@ footer .sep{color:var(--line2);margin:0 8px}
       <div class="field"><label>Comentarios <span class="opt">(opcional)</span></label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00…"></textarea></div>
     </div>
 
+    <p class="err" id="err"></p>
     <button type="button" class="btn btn-wa" id="send">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
       Enviar pedido por WhatsApp
     </button>
-    <p class="err" id="err"></p>
     <p class="aviso">Se abre WhatsApp con tu pedido ya escrito. El pedido queda confirmado cuando el local te responde.</p>
   </div>
 </div>
@@ -1051,11 +1056,22 @@ document.getElementById("pago").addEventListener("click", function(e){
 
 document.getElementById("send").onclick = function(){
   var err = document.getElementById("err");
+  function clearBad(){
+    var m = document.querySelectorAll(".field-bad");
+    for (var i = 0; i < m.length; i++) m[i].classList.remove("field-bad");
+  }
   function fail(msg, el){
-    err.textContent = msg; err.classList.add("show");
-    if (el) el.scrollIntoView({ behavior:"smooth", block:"center" });
+    err.textContent = msg;
+    err.classList.remove("show"); void err.offsetWidth; err.classList.add("show");
+    clearBad();
+    if (el) el.classList.add("field-bad");
+    requestAnimationFrame(function(){
+      err.scrollIntoView({ behavior:"smooth", block:"center" });
+      if (el && el.focus) { try { el.focus({ preventScroll:true }); } catch(e){ el.focus(); } }
+    });
   }
   err.classList.remove("show");
+  clearBad();
 
   var keys = Object.keys(cart);
   if (!keys.length) { fail("Agrega al menos un producto a tu pedido."); return; }
