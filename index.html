@@ -327,8 +327,26 @@ section{scroll-margin-top:74px}
   flex:1;padding:13px 8px;border-radius:12px;border:1px solid var(--line2);background:#000;
   color:var(--txt2);font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;
 }
+.seg button:hover{border-color:var(--line2);color:var(--txt)}
 .seg button.on{background:var(--rojo);border-color:var(--rojo);color:#fff;box-shadow:0 6px 18px rgba(224,42,53,.3)}
-.sheet .btn{width:100%;margin-top:19px}
+.seg-wrap{flex-wrap:wrap}
+.seg-wrap button{flex:1 1 28%;min-width:94px;padding:12px 6px;font-size:13px}
+
+/* secciones del formulario */
+.fsec{margin-top:20px;padding-top:17px;border-top:1px solid var(--line)}
+.fsec:first-of-type{margin-top:16px}
+.fsec-h{
+  font-family:'Bebas Neue',Impact,sans-serif;font-size:20px;letter-spacing:.05em;line-height:1;
+  color:var(--txt);display:flex;align-items:center;gap:9px;margin-bottom:2px;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:400px){.grid2{grid-template-columns:1fr}}
+.field select.num{
+  text-align:center;text-align-last:center;font-weight:800;font-size:16px;
+  padding-right:34px;background-position:right 13px center;
+}
+
+.sheet .btn{width:100%;margin-top:22px}
 .empty{text-align:center;color:var(--txt2);padding:28px 0;font-size:14px}
 .aviso{font-size:12px;color:var(--txt2);text-align:center;margin-top:12px;line-height:1.55}
 
@@ -490,30 +508,46 @@ footer .sep{color:var(--line2);margin:0 8px}
     <div id="lines"></div>
     <div class="total"><span>Total</span><span class="tv" id="mTotal">$0</span></div>
 
-    <div class="field">
-      <label>¿Cómo lo quieres?</label>
-      <div class="seg" id="modo">
-        <button class="on" data-m="Para llevar">🥡 Para llevar</button>
-        <button data-m="Para servir">🍽️ Para servir</button>
+    <div class="fsec">
+      <div class="fsec-h">🧾 Tus datos</div>
+      <div class="grid2">
+        <div class="field"><label>Nombre</label><input id="nombre" placeholder="Camila Rojas" autocomplete="name"></div>
+        <div class="field"><label>Contacto</label><input id="contacto" type="tel" inputmode="tel" placeholder="+56 9 1234 5678" autocomplete="tel"></div>
       </div>
+      <div class="field"><label>Dirección <span class="opt">(solo si es despacho)</span></label><input id="direccion" placeholder="Calle y número, depto, comuna" autocomplete="street-address"></div>
     </div>
-    <div class="field"><label>Tu nombre</label><input id="nombre" placeholder="Ej: Camila Rojas" autocomplete="name"></div>
-    <div class="field"><label>Número de contacto</label><input id="contacto" type="tel" inputmode="tel" placeholder="+56 9 1234 5678" autocomplete="tel"></div>
-    <div class="field"><label>Dirección <span class="opt">(solo si es despacho)</span></label><input id="direccion" placeholder="Calle y número, depto, comuna" autocomplete="street-address"></div>
-    <div class="field"><label>Salsas</label><input id="salsas" placeholder="Ej: 2 soya, 1 acevichada, 1 spicy"></div>
-    <div class="field"><label>Palitos</label><input id="palitos" type="number" min="0" inputmode="numeric" placeholder="¿Cuántos pares?"></div>
-    <div class="field"><label>Medio de pago</label>
-      <select id="pago">
-        <option value="">Selecciona…</option>
-        <option>Efectivo</option>
-        <option>Débito</option>
-        <option>Crédito</option>
-        <option>Transferencia</option>
-        <option>Pluxee</option>
-        <option>Edenred</option>
-      </select>
+
+    <div class="fsec">
+      <div class="fsec-h">🥢 Entrega y extras</div>
+      <div class="field">
+        <label>¿Cómo lo quieres?</label>
+        <div class="seg" id="modo">
+          <button type="button" class="on" data-m="Para llevar">🥡 Para llevar</button>
+          <button type="button" data-m="Para servir">🍽️ Para servir</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Salsas</label><select id="salsas" class="num"></select></div>
+        <div class="field"><label>Palitos <span class="opt">(pares)</span></label><select id="palitos" class="num"></select></div>
+      </div>
+      <div class="field"><label>¿Qué salsas? <span class="opt">(opcional)</span></label><input id="salsastipo" placeholder="Soya, acevichada, spicy…"></div>
     </div>
-    <div class="field"><label>Comentarios (opcional)</label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00..."></textarea></div>
+
+    <div class="fsec">
+      <div class="fsec-h">💳 Pago</div>
+      <div class="field">
+        <label>Medio de pago</label>
+        <div class="seg seg-wrap" id="pago">
+          <button type="button" data-v="Efectivo">Efectivo</button>
+          <button type="button" data-v="Débito">Débito</button>
+          <button type="button" data-v="Crédito">Crédito</button>
+          <button type="button" data-v="Transferencia">Transferencia</button>
+          <button type="button" data-v="Pluxee">Pluxee</button>
+          <button type="button" data-v="Edenred">Edenred</button>
+        </div>
+      </div>
+      <div class="field"><label>Comentarios <span class="opt">(opcional)</span></label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00…"></textarea></div>
+    </div>
 
     <button type="button" class="btn btn-wa" id="send">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
@@ -984,21 +1018,41 @@ document.getElementById("modo").addEventListener("click", function(e){
   modo = b.dataset.m;
 });
 
+/* opciones 0 a 10 para salsas y palitos */
+["salsas", "palitos"].forEach(function(id){
+  var sel = document.getElementById(id);
+  for (var i = 0; i <= 10; i++) {
+    var o = document.createElement("option");
+    o.value = i; o.textContent = i;
+    sel.appendChild(o);
+  }
+});
+
+/* medio de pago (botones) */
+var pago = "";
+document.getElementById("pago").addEventListener("click", function(e){
+  var b = e.target.closest("button");
+  if (!b) return;
+  document.querySelectorAll("#pago button").forEach(function(x){ x.classList.remove("on"); });
+  b.classList.add("on");
+  pago = b.dataset.v;
+});
+
 document.getElementById("send").onclick = function(){
   var keys = Object.keys(cart);
   if (!keys.length) { alert("Agrega al menos un producto a tu pedido."); return; }
 
-  var nombre    = document.getElementById("nombre").value.trim();
-  var contacto  = document.getElementById("contacto").value.trim();
-  var direccion = document.getElementById("direccion").value.trim();
-  var salsas    = document.getElementById("salsas").value.trim();
-  var palitos   = document.getElementById("palitos").value.trim();
-  var pago      = document.getElementById("pago").value;
-  var nota      = document.getElementById("nota").value.trim();
+  var nombre     = document.getElementById("nombre").value.trim();
+  var contacto   = document.getElementById("contacto").value.trim();
+  var direccion  = document.getElementById("direccion").value.trim();
+  var salsas     = document.getElementById("salsas").value;
+  var salsastipo = document.getElementById("salsastipo").value.trim();
+  var palitos    = document.getElementById("palitos").value;
+  var nota       = document.getElementById("nota").value.trim();
 
   if (!nombre)   { alert("Escribe tu nombre para el pedido."); document.getElementById("nombre").focus(); return; }
   if (!contacto) { alert("Escribe un número de contacto."); document.getElementById("contacto").focus(); return; }
-  if (!pago)     { alert("Elige un medio de pago."); document.getElementById("pago").focus(); return; }
+  if (!pago)     { alert("Elige un medio de pago."); document.getElementById("pago").scrollIntoView({ behavior:"smooth", block:"center" }); return; }
 
   var L = [];
   L.push("*NUEVO PEDIDO - VIVA SUSHI*");
@@ -1014,8 +1068,8 @@ document.getElementById("send").onclick = function(){
   L.push("Contacto: " + contacto);
   L.push("Modalidad: " + modo);
   if (direccion) L.push("Dirección: " + direccion);
-  L.push("Salsas: " + (salsas || "—"));
-  L.push("Palitos: " + (palitos ? palitos + " par(es)" : "—"));
+  L.push("Salsas: " + salsas + (salsastipo ? " (" + salsastipo + ")" : ""));
+  L.push("Palitos: " + palitos + " par(es)");
   L.push("Medio de pago: " + pago);
   if (nota) L.push("Comentario: " + nota);
   L.push("");
