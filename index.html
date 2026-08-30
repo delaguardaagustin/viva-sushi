@@ -363,6 +363,11 @@ section{scroll-margin-top:74px}
 .req{color:var(--rojo);font-weight:800}
 .field-bad{outline:2px solid var(--rojo);outline-offset:2px;border-radius:12px}
 input.field-bad{outline:none;border-color:var(--rojo)}
+.done{display:none;margin-top:18px;padding-top:18px;border-top:1px solid var(--line);text-align:center}
+.done.show{display:block;animation:errpop .28s ease}
+.done-t{font-family:'Bebas Neue',Impact,sans-serif;font-size:23px;letter-spacing:.04em;color:var(--txt);margin-bottom:14px}
+.done .btn{width:100%}
+.done .btn-ghost{margin-top:10px}
 
 /* ---------- FOOTER ---------- */
 footer{position:relative;border-top:1px solid var(--line);padding:44px 0 38px;text-align:center;color:var(--txt2);font-size:13.5px;overflow:hidden}
@@ -563,12 +568,24 @@ footer .sep{color:var(--line2);margin:0 8px}
       <div class="field"><label>Comentarios <span class="opt">(opcional)</span></label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00…"></textarea></div>
     </div>
 
-    <p class="err" id="err"></p>
-    <button type="button" class="btn btn-wa" id="send">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
-      Enviar pedido por WhatsApp
-    </button>
-    <p class="aviso">Se abre WhatsApp con tu pedido ya escrito. El pedido queda confirmado cuando el local te responde.</p>
+    <div id="sendWrap">
+      <p class="err" id="err"></p>
+      <button type="button" class="btn btn-wa" id="send">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
+        Enviar pedido por WhatsApp
+      </button>
+      <p class="aviso">Se abre WhatsApp con tu pedido ya escrito. El pedido queda confirmado cuando el local te responde.</p>
+    </div>
+
+    <div class="done" id="done">
+      <p class="done-t">Tu pedido está listo ✅</p>
+      <a class="btn btn-wa" id="waLink" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
+        Abrir WhatsApp y enviar
+      </a>
+      <button type="button" class="btn btn-ghost" id="copyBtn">Copiar pedido</button>
+      <p class="aviso">Si WhatsApp no se abrió solo, toca <b>“Abrir WhatsApp y enviar”</b>. O copia el pedido y mándalo al <b>+56 9 9788 7871</b>.</p>
+    </div>
   </div>
 </div>
 
@@ -1017,7 +1034,15 @@ function renderLines(){
   });
 }
 
-function openModal(){ renderLines(); modal.classList.add("show"); document.body.style.overflow = "hidden"; }
+function openModal(){
+  renderLines();
+  // volver al estado inicial del formulario (por si ya se habia enviado antes)
+  document.getElementById("sendWrap").style.display = "";
+  document.getElementById("done").classList.remove("show");
+  document.getElementById("err").classList.remove("show");
+  modal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
 function closeModal(){ modal.classList.remove("show"); document.body.style.overflow = ""; }
 
 document.getElementById("barOpen").onclick = openModal;
@@ -1116,17 +1141,38 @@ document.getElementById("send").onclick = function(){
   var texto = L.join("\n");
   var url = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(texto);
 
-  // Navegación directa: es lo más confiable en móvil (abre la app de WhatsApp)
-  // y en escritorio (WhatsApp Web / app). La pestaña con el pedido queda atrás.
-  window.location.href = url;
+  // Guardar para el botón "Copiar pedido" y preparar el enlace directo.
+  window.__pedidoTxt = texto;
+  var waLink = document.getElementById("waLink");
+  waLink.href = url;
 
-  // Respaldo por si la navegación anterior no se concreta (algún navegador la
-  // ignora): se reintenta y se deja el pedido a la vista para copiarlo a mano.
-  setTimeout(function(){
-    window.open(url, "_blank");
-    err.textContent = "Si WhatsApp no se abrió solo, toca de nuevo el botón o copia tu pedido y escríbenos al " + WHATSAPP + ".";
-    err.classList.add("show");
-  }, 1200);
+  // Mostrar el panel de confirmación con enlace real (funciona incluso dentro
+  // de navegadores de Instagram/Facebook, donde la navegación automática falla).
+  clearBad();
+  err.classList.remove("show");
+  document.getElementById("sendWrap").style.display = "none";
+  var done = document.getElementById("done");
+  done.classList.add("show");
+  done.scrollIntoView({ behavior:"smooth", block:"center" });
+
+  // Intento de apertura automática (gesto del usuario aún activo).
+  waLink.click();
+};
+
+document.getElementById("copyBtn").onclick = function(){
+  var t = (window.__pedidoTxt || "") + "\n\nEnviar a: " + WHATSAPP;
+  var btn = this;
+  function ok(){ btn.textContent = "¡Copiado! ✅"; setTimeout(function(){ btn.textContent = "Copiar pedido"; }, 2500); }
+  function legacy(){
+    var ta = document.createElement("textarea");
+    ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; ta.style.top = "0";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand("copy"); ok(); } catch(e){ alert("Copia tu pedido:\n\n" + t); }
+    ta.remove();
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(ok).catch(legacy);
+  } else { legacy(); }
 };
 
 updateBar();
