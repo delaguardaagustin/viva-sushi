@@ -325,6 +325,13 @@ section{scroll-margin-top:74px}
   background-repeat:no-repeat;background-position:right 15px center;padding-right:38px;
 }
 .field .opt{text-transform:none;letter-spacing:0;color:var(--txt2);font-weight:400}
+.telrow{display:flex;width:100%}
+.telpfx{
+  flex:none;display:flex;align-items:center;white-space:nowrap;padding:0 13px;
+  background:#111;color:var(--txt);font-size:15px;font-weight:700;
+  border:1px solid var(--line2);border-right:none;border-radius:12px 0 0 12px;
+}
+.telrow input#telNum{flex:1 1 auto;width:auto;min-width:0;border-radius:0 12px 12px 0;letter-spacing:.06em}
 .seg{display:flex;gap:8px}
 .seg button{
   flex:1;padding:13px 8px;border-radius:12px;border:1px solid var(--line2);background:#000;
@@ -534,7 +541,12 @@ footer .sep{color:var(--line2);margin:0 8px}
       <div class="fsec-h">🧾 Tus datos</div>
       <div class="grid2">
         <div class="field"><label>Nombre <span class="req">*</span></label><input id="nombre" placeholder="Camila Rojas" autocomplete="name"></div>
-        <div class="field"><label>Contacto <span class="req">*</span></label><input id="contacto" type="tel" inputmode="tel" placeholder="+56 9 1234 5678" autocomplete="tel"></div>
+        <div class="field"><label>Contacto <span class="req">*</span></label>
+          <div class="telrow">
+            <span class="telpfx">+56&nbsp;9</span>
+            <input id="telNum" type="tel" inputmode="numeric" maxlength="8" placeholder="1234 5678" autocomplete="tel-national">
+          </div>
+        </div>
       </div>
       <div class="field"><label>Dirección <span class="opt">(solo si es despacho)</span></label><input id="direccion" placeholder="Calle y número, depto, comuna" autocomplete="street-address"></div>
     </div>
@@ -1045,6 +1057,7 @@ function openModal(){
   document.getElementById("err").classList.remove("show");
   modal.classList.add("show");
   document.body.style.overflow = "hidden";
+  bar.classList.remove("show"); // ocultar la barra inferior mientras el modal está abierto
   var sheet = modal.querySelector(".sheet");
   sheet.scrollTop = 0;
   // Red de seguridad: si la animación de entrada no avanza (móviles con
@@ -1056,7 +1069,7 @@ function openModal(){
     sheet.style.opacity = "1";
   }, 360);
 }
-function closeModal(){ modal.classList.remove("show"); document.body.style.overflow = ""; }
+function closeModal(){ modal.classList.remove("show"); document.body.style.overflow = ""; updateBar(); }
 
 document.getElementById("barOpen").onclick = openModal;
 document.getElementById("barGo").onclick   = openModal;
@@ -1080,6 +1093,14 @@ document.getElementById("modo").addEventListener("click", function(e){
     o.value = i; o.textContent = i;
     sel.appendChild(o);
   }
+});
+
+/* teléfono: solo dígitos, 8 como máximo (el +56 9 es fijo) */
+document.getElementById("telNum").addEventListener("input", function(){
+  var d = this.value.replace(/\D/g, "");
+  if (d.length > 8) { d = d.replace(/^56/, ""); }   // pegó el código de país
+  if (d.length > 8) { d = d.replace(/^9/, ""); }    // pegó también el 9 del móvil
+  this.value = d.slice(0, 8);
 });
 
 /* medio de pago (botones) */
@@ -1118,7 +1139,7 @@ document.getElementById("send").onclick = function(){
   if (!keys.length) { fail("Agrega al menos un producto a tu pedido."); return; }
 
   var nombre     = document.getElementById("nombre").value.trim();
-  var contacto   = document.getElementById("contacto").value.trim();
+  var contacto   = document.getElementById("telNum").value.replace(/\D/g, "");
   var direccion  = document.getElementById("direccion").value.trim();
   var soya       = +document.getElementById("salsaSoya").value;
   var dulce      = +document.getElementById("salsaDulce").value;
@@ -1129,9 +1150,11 @@ document.getElementById("send").onclick = function(){
   var salsasTxt = salsasParts.length ? salsasParts.join(", ") : "0";
   var nota       = document.getElementById("nota").value.trim();
 
-  if (!nombre)   { fail("Escribe tu nombre para el pedido.", document.getElementById("nombre")); return; }
-  if (!contacto) { fail("Escribe un número de contacto.", document.getElementById("contacto")); return; }
-  if (!pago)     { fail("Elige un medio de pago.", document.getElementById("pago")); return; }
+  if (!nombre)              { fail("Escribe tu nombre para el pedido.", document.getElementById("nombre")); return; }
+  if (contacto.length !== 8) { fail("Escribe los 8 dígitos de tu número (después del +56 9).", document.getElementById("telNum")); return; }
+  if (!pago)                 { fail("Elige un medio de pago.", document.getElementById("pago")); return; }
+
+  var telFmt = "+56 9 " + contacto.slice(0, 4) + " " + contacto.slice(4);
 
   var L = [];
   L.push("*NUEVO PEDIDO - VIVA SUSHI*");
@@ -1144,7 +1167,7 @@ document.getElementById("send").onclick = function(){
   L.push("*Total: " + clp(totals().t) + "*");
   L.push("");
   L.push("Nombre: " + nombre);
-  L.push("Contacto: " + contacto);
+  L.push("Contacto: " + telFmt);
   L.push("Modalidad: " + modo);
   if (direccion) L.push("Dirección: " + direccion);
   L.push("Salsas: " + salsasTxt);
