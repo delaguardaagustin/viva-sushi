@@ -283,14 +283,17 @@ section{scroll-margin-top:74px}
   position:fixed;inset:0;z-index:100;display:none;
   background:rgba(0,0,0,.75);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
 }
-.modal.show{display:flex;align-items:flex-end;justify-content:center}
+.modal.show{display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
 .sheet{
-  background:var(--bg2);width:100%;max-width:540px;max-height:92vh;overflow-y:auto;
+  background:var(--bg2);width:100%;max-width:540px;overflow-y:auto;
+  max-height:92vh;max-height:92dvh;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
   border-radius:24px 24px 0 0;border:1px solid var(--line2);border-bottom:none;
   padding:22px 20px calc(22px + env(safe-area-inset-bottom));
-  animation:up .32s cubic-bezier(.2,.9,.2,1);
+  transform:translateY(0);
+  animation:up .28s ease-out both;
 }
-@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes up{from{transform:translateY(16px);opacity:.5}to{transform:translateY(0);opacity:1}}
 @media(min-width:600px){.modal.show{align-items:center}.sheet{border-radius:24px;border-bottom:1px solid var(--line2)}}
 .sheet-head{display:flex;align-items:center;gap:11px;margin-bottom:16px}
 .sheet-head img{height:26px;width:auto}
@@ -1042,6 +1045,16 @@ function openModal(){
   document.getElementById("err").classList.remove("show");
   modal.classList.add("show");
   document.body.style.overflow = "hidden";
+  var sheet = modal.querySelector(".sheet");
+  sheet.scrollTop = 0;
+  // Red de seguridad: si la animación de entrada no avanza (móviles con
+  // "reducir movimiento", ahorro de batería, pestaña en 2º plano...), cortarla
+  // y forzar la posición final para que la hoja no quede fuera de la pantalla.
+  setTimeout(function(){
+    sheet.style.animation = "none";
+    sheet.style.transform = "none";
+    sheet.style.opacity = "1";
+  }, 360);
 }
 function closeModal(){ modal.classList.remove("show"); document.body.style.overflow = ""; }
 
@@ -1081,6 +1094,12 @@ document.getElementById("pago").addEventListener("click", function(e){
 
 document.getElementById("send").onclick = function(){
   var err = document.getElementById("err");
+  var sheet = modal.querySelector(".sheet");
+  function scrollSheetToBottom(){
+    // desplazamiento determinista (scrollIntoView es poco fiable dentro del modal en móvil)
+    requestAnimationFrame(function(){ sheet.scrollTop = sheet.scrollHeight; });
+    setTimeout(function(){ sheet.scrollTop = sheet.scrollHeight; }, 60);
+  }
   function clearBad(){
     var m = document.querySelectorAll(".field-bad");
     for (var i = 0; i < m.length; i++) m[i].classList.remove("field-bad");
@@ -1090,10 +1109,7 @@ document.getElementById("send").onclick = function(){
     err.classList.remove("show"); void err.offsetWidth; err.classList.add("show");
     clearBad();
     if (el) el.classList.add("field-bad");
-    requestAnimationFrame(function(){
-      err.scrollIntoView({ behavior:"smooth", block:"center" });
-      if (el && el.focus) { try { el.focus({ preventScroll:true }); } catch(e){ el.focus(); } }
-    });
+    scrollSheetToBottom();
   }
   err.classList.remove("show");
   clearBad();
@@ -1153,7 +1169,7 @@ document.getElementById("send").onclick = function(){
   document.getElementById("sendWrap").style.display = "none";
   var done = document.getElementById("done");
   done.classList.add("show");
-  done.scrollIntoView({ behavior:"smooth", block:"center" });
+  scrollSheetToBottom();
 
   // Intento de apertura automática (gesto del usuario aún activo).
   waLink.click();
