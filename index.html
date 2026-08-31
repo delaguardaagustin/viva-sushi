@@ -562,7 +562,7 @@ footer .sep{color:var(--line2);margin:0 8px}
       </div>
       <div class="grid3">
         <div class="field"><label>Salsa soya</label><select id="salsaSoya" class="num"></select></div>
-        <div class="field"><label>Salsa dulce</label><select id="salsaDulce" class="num"></select></div>
+        <div class="field"><label>Salsa teriyaki</label><select id="salsaTeriyaki" class="num"></select></div>
         <div class="field"><label>Palitos <span class="opt">(pares)</span></label><select id="palitos" class="num"></select></div>
       </div>
     </div>
@@ -1096,7 +1096,7 @@ document.getElementById("modo").addEventListener("click", function(e){
 });
 
 /* opciones 0 a 10 para salsas y palitos */
-["salsaSoya", "salsaDulce", "palitos"].forEach(function(id){
+["salsaSoya", "salsaTeriyaki", "palitos"].forEach(function(id){
   var sel = document.getElementById(id);
   for (var i = 0; i <= 10; i++) {
     var o = document.createElement("option");
@@ -1152,11 +1152,11 @@ document.getElementById("send").onclick = function(){
   var contacto   = document.getElementById("telNum").value.replace(/\D/g, "");
   var direccion  = document.getElementById("direccion").value.trim();
   var soya       = +document.getElementById("salsaSoya").value;
-  var dulce      = +document.getElementById("salsaDulce").value;
+  var teriyaki   = +document.getElementById("salsaTeriyaki").value;
   var palitos    = document.getElementById("palitos").value;
   var salsasParts = [];
-  if (soya)  salsasParts.push(soya + " soya");
-  if (dulce) salsasParts.push(dulce + " dulce");
+  if (soya)     salsasParts.push(soya + " soya");
+  if (teriyaki) salsasParts.push(teriyaki + " teriyaki");
   var salsasTxt = salsasParts.length ? salsasParts.join(", ") : "0";
   var nota       = document.getElementById("nota").value.trim();
 
