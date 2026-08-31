@@ -447,7 +447,7 @@ footer .sep{color:var(--line2);margin:0 8px}
       <div class="info-card reveal">
         <div class="ic">🕐</div>
         <h3>Horario</h3>
-        <p>Martes a Sábado<small>13:00 a 22:00 hrs · Lunes cerrado</small></p>
+        <p>Martes a Sábado<small>13:00 a 22:00 hrs · Domingo y Lunes cerrado</small></p>
       </div>
       <div class="info-card reveal">
         <div class="ic">🥡</div>
@@ -625,13 +625,13 @@ var FOTOS = {
 };
 
 var CARTA = [
-  { cat:"Promociones VIVA", nota:"Todas incluyen salsas a elección. Rolls de 10 piezas.", items:[
+  { cat:"Promociones VIVA", nota:"Todas incluyen salsas a elección (soya y teriyaki). Rolls de 10 piezas.", items:[
     {n:"VIVA 1 — 20 piezas frías", d:"10 pzs California Kani (kanikama, queso crema, cebollín, en sésamo o ciboulette) + 10 pzs Maki Cheese (queso crema, cebollín, en alga nori). 1 salsa a elección.", p:4000, tag:"Económica"},
     {n:"VIVA 2 — 20 piezas frías", d:"10 pzs California Vegeta (palmito, queso crema, cebollín, en sésamo o ciboulette) + 10 pzs Maki Palta (palta, cebollín, en alga nori). 1 salsa a elección.", p:4000},
     {n:"VIVA 3 — 20 piezas", d:"10 fritas + 10 frías. Cheese Tory (pollo teriyaki, palta, cebollín, en queso crema) + Tempura Ebi (camarón, queso crema, cebollín, frito). 2 salsas a elección.", p:7000},
     {n:"VIVA 4 — 20 piezas fritas", d:"Tempura Tory (pollo teriyaki, queso crema, cebollín) + Tempura Kani (kanikama, queso crema, cebollín). 2 salsas a elección.", p:6500},
     {n:"VIVA 5 — 20 piezas", d:"10 fritas + 10 frías. Tempura Ebi (camarón, queso crema, cebollín) + California Kani (kanikama, queso crema, cebollín, en sésamo o ciboulette). 2 salsas a elección.", p:6500},
-    {n:"VIVA 6 — 30 piezas", d:"10 fritas + 20 frías. Tempura Sake + Avocado Vegeta + Maki Palta. 2 salsas a elección.", p:8500},
+    {n:"VIVA 6 — 30 piezas", d:"10 fritas + 20 frías. Tempura Sake + Avocado Vegeta + Maki Palta. 2 salsas a elección.", p:9000},
     {n:"VIVA 7 — 30 piezas frías", d:"Cheese Vegeta + California Cheese + Avocado Tory. 2 salsas a elección.", p:9500, tag:"Popular"},
     {n:"VIVA 8 — 40 piezas", d:"10 fritas + 30 frías. Tempura Light + California Cheese + Cheese Vegeta + Maki Cheese. 3 salsas a elección.", p:11000},
     {n:"VIVA 9 — 40 piezas", d:"20 fritas + 20 frías. Tempura Tory + Tempura Kani + California Ebi + Avocado Sake. 4 salsas a elección.", p:13500},
@@ -644,7 +644,7 @@ var CARTA = [
   ]},
 
   { cat:"Rolls especiales", nota:"Nuestras creaciones de la casa.", items:[
-    {n:"Sushi Burger", d:"Pan de arroz apanado y frito, relleno de pollo, palta, queso crema, cebollín y alga nori. Se sirve caliente.", p:6500, tag:"Nuevo"},
+    {n:"Viva Burger", d:"Pan de arroz apanado y frito, relleno de pollo, palta, queso crema, cebollín y alga nori. Se sirve caliente.", p:6500, tag:"Nuevo"},
     {n:"E1 · Roll cheese apanado", d:"Pollo, palta, cebollín. Envuelto en queso crema y frito.", p:4500},
     {n:"E2 · Roll acevichado", d:"Camarón tempura, queso crema, cebollín, envuelto en salmón. Bañado en salsa acevichada.", p:4900, tag:"Recomendado"},
     {n:"E3 · Cheese especial", d:"Camarón, palta, cebollín, envuelto en queso crema y espolvoreado con un leve toque de merquén ahumado.", p:4700},
@@ -729,7 +729,7 @@ var CARTA = [
     {n:"47 · Tempura Tory", d:"Pollo teriyaki, queso crema, cebollín", p:4000},
     {n:"48 · Tempura Tako", d:"Pulpo, queso crema, cebollín", p:4700},
     {n:"49 · Tempura Tory Furai", d:"Pollo tempurizado, queso crema, cebollín", p:4300},
-    {n:"50 · Tempura Kanikama", d:"Kanikama, queso crema, cebollín, frito", p:3900},
+    {n:"50 · Tempura Kanikama", d:"Kanikama, queso crema, cebollín, frito", p:3800},
     {n:"51 · Tempura Sake Furai", d:"Salmón tempurizado, queso crema, cebollín", p:4800}
   ]},
 
@@ -766,17 +766,27 @@ var CARTA = [
     {n:"T5 · Temaki Tako", d:"Pulpo, queso crema, palta, cebollín", p:4200}
   ]},
 
+  { cat:"Handroll", nota:"Cono de alga relleno. Todos con queso crema y cebollín.", items:[
+    {n:"Handroll Pollo", d:"Pollo, queso crema, cebollín", p:3000},
+    {n:"Handroll Kanikama", d:"Kanikama, queso crema, cebollín", p:2500},
+    {n:"Handroll Camarón", d:"Camarón, queso crema, cebollín", p:3500},
+    {n:"Handroll Palmito", d:"Palmito, queso crema, cebollín", p:2500},
+    {n:"Handroll Choclo", d:"Choclo, queso crema, cebollín", p:2500},
+    {n:"Handroll Carne mechada", d:"Carne mechada, queso crema, cebollín", p:3500}
+  ]},
+
   { cat:"Nigiri y Sashimi", nota:"Nigiri: 2 unidades.", items:[
+    {n:"Sashimi", d:"5 cortes finos de lomo de salmón", p:4500},
     {n:"N1 · Nigiri Sake", d:"Bolitas de arroz cubiertas de salmón", p:3000},
     {n:"N2 · Nigiri Ebi", d:"Bolitas de arroz cubiertas de camarón", p:3000},
     {n:"N3 · Nigiri Tako Spicy", d:"Bolitas de arroz cubiertas de pulpo y bañadas en salsa spicy", p:3200},
-    {n:"N4 · Nigiri Masago", d:"Bolitas de arroz cubiertas de masago", p:2600},
-    {n:"Sashimi", d:"5 cortes", p:4500}
+    {n:"N4 · Nigiri Masago", d:"Bolitas de arroz cubiertas de masago", p:2600}
   ]},
 
   { cat:"Entradas y salsas", items:[
     {n:"Gyozas (5 unidades)", d:"Cerdo, camarón, pollo, champiñón-queso crema o verduras", p:3000},
-    {n:"Ceviche estilo peruano", d:"Pescado blanco, salmón, palta, ciboulette, pimentón, cebolla morada", p:6000},
+    {n:"Ceviche estilo peruano", d:"Pescado blanco, salmón, palta, ciboulette, pimentón, cebolla morada", p:7000},
+    {n:"Ceviche chico", d:"Pescado blanco, salmón, palta, ciboulette, pimentón, cebolla morada. Porción individual.", p:4000},
     {n:"Salsa acevichada", d:"", p:1200},
     {n:"Salsa spicy", d:"Salsa picante", p:1000}
   ]},
