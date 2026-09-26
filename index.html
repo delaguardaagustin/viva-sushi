@@ -268,6 +268,8 @@ section{scroll-margin-top:74px}
 .vaciar:hover{color:var(--papel)}
 .empty{text-align:center;color:var(--papel2);padding:28px 0;font-size:15px}
 .aviso{font-size:13.5px;color:var(--papel2);text-align:center;margin-top:12px;line-height:1.55}
+.aviso-legal{margin-top:6px}
+.aviso-legal a{color:var(--papel);text-underline-offset:3px}
 .err{display:none;margin-top:16px;padding:12px 15px;border-radius:6px;font-size:15px;font-weight:700;text-align:center;color:var(--papel);background:var(--rojo);border:1px solid var(--rojo-vivo)}
 .err.show{display:block;animation:errpop .28s ease}
 @keyframes errpop{from{transform:translateY(-6px);opacity:0}to{transform:none;opacity:1}}
@@ -431,6 +433,7 @@ footer .sep{margin:0 8px;color:var(--linea2)}
     <img src="assets/logo.png" alt="Viva Sushi" width="1138" height="435" loading="lazy">
     <p>Santa Rosa #8689, San Ramón<span class="sep">·</span>Martes a sábado 13:00–22:00</p>
     <p style="margin-top:7px"><a href="https://wa.me/56997887871">+56 9 9788 7871</a></p>
+    <p style="margin-top:7px"><a href="terminos.html">Términos y condiciones</a><span class="sep">·</span><a href="privacidad.html">Política de privacidad</a></p>
   </div>
 </footer>
 
@@ -524,6 +527,7 @@ footer .sep{margin:0 8px;color:var(--linea2)}
         Enviar pedido por WhatsApp
       </button>
       <p class="aviso">Se abre WhatsApp con tu pedido ya escrito. El pedido queda confirmado cuando el local te responde.</p>
+      <p class="aviso aviso-legal">Al enviar tu pedido aceptas los <a href="terminos.html" target="_blank" rel="noopener">Términos</a> y la <a href="privacidad.html" target="_blank" rel="noopener">Política de Privacidad</a>.</p>
     </div>
 
     <div class="done" id="done" tabindex="-1">

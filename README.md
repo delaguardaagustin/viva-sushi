@@ -21,6 +21,7 @@ El cliente arma su pedido y lo envía por WhatsApp con el detalle ya escrito.
 - Recuerda (sin obligar) elegir las salsas que incluyen las promos y los palitos.
 - El carrito se guarda en el navegador por 24 horas (si se recarga, no se pierde).
 - Enlaces a Instagram, Facebook y Google Maps.
+- Páginas legales: `terminos.html` (términos y condiciones) y `privacidad.html` (política de privacidad), enlazadas en el pie de página y en el modal "Tu pedido". Incluidas en `sitemap.xml`; `robots.txt` apunta al sitemap.
 
 ## Cómo funciona
 
@@ -101,3 +102,7 @@ El pedido separa dos bloques: **Salsas incluidas** (aparece solo si hay una prom
 - Promos VIVA: las que diga su descripción (`N salsas a elección`).
 - Rolls (especiales, California, Hosomaki, Cheese, Avocado, Tempura, Sake, Futomaki y veganos): 1 salsa por unidad, **salvo E2 y E4** (ya vienen con su salsa). Se controla con `CATS_CON_SALSA` y `SIN_SALSA` en `index.html`.
 - Temaki, handroll, nigiri, entradas y "Arma tu roll": sin salsa incluida (por confirmar con el local).
+
+## Pendiente del dueño (legal)
+
+En `terminos.html` y `privacidad.html` busca el comentario `<!-- COMPLETAR: razón social, RUT y correo -->` y agrega esos datos en el bloque de responsable. Las páginas son una guía y conviene que las revise un abogado.
