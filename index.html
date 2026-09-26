@@ -92,7 +92,7 @@ header{position:sticky;top:0;z-index:50;background:var(--sumi);border-bottom:1px
 .hero{position:relative;padding:52px 0 60px;overflow:hidden;border-bottom:1px solid var(--linea)}
 .hero-grid{display:grid;gap:40px;align-items:center}
 @media(min-width:900px){.hero-grid{grid-template-columns:1.1fr .9fr;gap:60px}}
-.hero-logo{width:min(70vw,330px);margin:0 0 30px}
+.hero-logo{width:min(70vw,330px);height:auto;margin:0 0 30px}
 .hero h1{font-size:clamp(2.5rem,9.5vw,4.6rem);margin-bottom:22px}
 .hero h1 em{font-style:normal;color:var(--rojo-vivo)}
 .hero .sub{color:var(--papel2);font-size:clamp(16px,3.6vw,18.5px);max-width:34em;margin-bottom:30px}
@@ -132,6 +132,7 @@ header{position:sticky;top:0;z-index:50;background:var(--sumi);border-bottom:1px
 
 /* ---------- SECCIONES ---------- */
 section{scroll-margin-top:74px}
+.cat{scroll-margin-top:92px}
 .sec-head{padding:64px 0 6px;max-width:44em}
 .sec-head h2{font-size:clamp(2.3rem,8vw,3.8rem);margin-bottom:12px}
 .sec-head p{color:var(--papel2);font-size:16px}
@@ -172,6 +173,19 @@ section{scroll-margin-top:74px}
 .qty button:hover{background:var(--rojo)}
 .qty span{min-width:30px;text-align:center;font-weight:700;font-size:16px}
 
+/* buscador de la carta */
+.buscador{position:relative;margin-top:22px;max-width:520px}
+.buscador input{width:100%;min-height:48px;background:var(--sumi2);border:1px solid var(--linea2);border-radius:6px;padding:0 44px 0 16px;color:var(--papel);font-family:inherit;font-size:16px;transition:border-color .16s}
+.buscador input:focus{outline:none;border-color:var(--rojo-vivo)}
+.buscador input::-webkit-search-cancel-button{display:none}
+.buscador button{position:absolute;right:2px;top:2px;width:44px;height:44px;background:none;border:none;color:var(--papel2);font-size:24px;cursor:pointer;line-height:1}
+.buscador button:hover{color:var(--papel)}
+.busq-info{margin-top:10px;font-size:15px;color:var(--papel2);min-height:22px}
+.sin-res{padding:40px 0;text-align:center;color:var(--papel2)}
+.tabs.oculto{display:none}
+.skip{position:absolute;left:8px;top:-60px;z-index:200;background:var(--papel);color:var(--sumi);padding:12px 16px;border-radius:6px;font-weight:700;text-decoration:none}
+.skip:focus{top:8px}
+
 /* ---------- CONTACTO ---------- */
 .social{padding:8px 0 56px}
 .social-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:30px;border-top:1px solid var(--linea)}
@@ -183,8 +197,8 @@ section{scroll-margin-top:74px}
 .soc small{color:var(--papel2);font-size:14.5px}
 
 /* ---------- BARRA CARRITO ---------- */
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--sumi2);border-top:1px solid var(--linea2);padding:12px 0 calc(12px + env(safe-area-inset-bottom));transform:translateY(130%);transition:transform .32s cubic-bezier(.16,1,.3,1);box-shadow:0 -10px 34px rgba(0,0,0,.55)}
-.bar.show{transform:translateY(0)}
+.bar{visibility:hidden;position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--sumi2);border-top:1px solid var(--linea2);padding:12px 0 calc(12px + env(safe-area-inset-bottom));transform:translateY(130%);transition:transform .32s cubic-bezier(.16,1,.3,1),visibility 0s .32s;box-shadow:0 -10px 34px rgba(0,0,0,.55)}
+.bar.show{transform:translateY(0);visibility:visible;transition:transform .32s cubic-bezier(.16,1,.3,1),visibility 0s}
 .bar-in{display:flex;align-items:center;gap:14px}
 .bar-icono{width:46px;height:46px;border-radius:6px;flex:none;display:grid;place-items:center;position:relative;border:1px solid var(--linea2)}
 .bar-icono .bolsa{width:24px;height:24px;fill:none;stroke:var(--papel);stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
@@ -238,6 +252,14 @@ section{scroll-margin-top:74px}
 @media(max-width:400px){.grid2,.grid3{grid-template-columns:1fr}}
 .field select.num{text-align:center;text-align-last:center;font-weight:700;padding-right:34px;background-position:right 13px center}
 .sheet .btn{width:100%;margin-top:22px}
+.sheet:focus{outline:none}
+.cerrado-aviso{display:none;margin:0 0 16px;padding:12px 15px;border-radius:6px;font-size:15px;line-height:1.5;color:var(--papel);background:var(--sumi3);border:1px solid var(--rojo-vivo)}
+.cerrado-aviso.show{display:block}
+.pista{display:none;margin-top:12px;font-size:14.5px;line-height:1.5;color:var(--papel2)}
+.pista.show{display:block}
+.pista b{color:var(--papel)}
+.vaciar{display:block;margin:14px auto 0;background:none;border:none;color:var(--papel2);text-decoration:underline;font-size:14.5px;cursor:pointer;font-family:inherit;min-height:44px;padding:0 12px}
+.vaciar:hover{color:var(--papel)}
 .empty{text-align:center;color:var(--papel2);padding:28px 0;font-size:15px}
 .aviso{font-size:13.5px;color:var(--papel2);text-align:center;margin-top:12px;line-height:1.55}
 .err{display:none;margin-top:16px;padding:12px 15px;border-radius:6px;font-size:15px;font-weight:700;text-align:center;color:var(--papel);background:var(--rojo);border:1px solid var(--rojo-vivo)}
@@ -267,10 +289,11 @@ footer .sep{margin:0 8px;color:var(--linea2)}
 </head>
 <body>
 
+<a class="skip" href="#carta">Ir a la carta</a>
 <header>
   <div class="wrap nav">
-    <a href="#top"><img class="marca" src="assets/logo.png" alt="Viva Sushi"></a>
-    <nav class="nav-links">
+    <a href="#top"><img class="marca" src="assets/logo.png" alt="Viva Sushi" width="1138" height="435"></a>
+    <nav class="nav-links" aria-label="Principal">
       <a href="#carta">Carta</a>
       <a href="#info">Información</a>
       <a href="#contacto">Contacto</a>
@@ -282,10 +305,11 @@ footer .sep{margin:0 8px;color:var(--linea2)}
   </div>
 </header>
 
+<main>
 <div class="hero" id="top">
   <div class="wrap hero-grid">
     <div>
-      <img class="hero-logo" src="assets/logo.png" alt="Viva Sushi">
+      <img class="hero-logo" src="assets/logo.png" alt="Viva Sushi" width="1138" height="435">
       <h1 class="display">Sushi artesanal<br>en <em>San Ramón</em></h1>
       <p class="sub">Pide <b>para servir</b> en el local o <b>para llevar</b>. Arma tu pedido acá abajo y te lo enviamos directo por WhatsApp.</p>
       <div class="cta-row">
@@ -295,11 +319,11 @@ footer .sep{margin:0 8px;color:var(--linea2)}
       <p class="abierto" id="abierto" aria-live="polite"><i aria-hidden="true"></i><span>Martes a sábado, de 13:00 a 22:00</span></p>
     </div>
     <div class="racimo" aria-hidden="true">
-      <figure class="a"><img src="assets/roll-sesamo.jpg" alt="" loading="lazy"></figure>
-      <figure class="b"><img src="assets/roll-cheese.jpg" alt="" loading="lazy"></figure>
-      <figure class="c"><img src="assets/roll-palta.jpg" alt="" loading="lazy"></figure>
-      <figure class="d"><img src="assets/roll-salmon.jpg" alt="" loading="lazy"></figure>
-      <figure class="e"><img src="assets/roll-nori.jpg" alt="" loading="lazy"></figure>
+      <figure class="a"><img src="assets/roll-sesamo.jpg" alt="" width="420" height="420"></figure>
+      <figure class="b"><img src="assets/roll-cheese.jpg" alt="" width="420" height="420"></figure>
+      <figure class="c"><img src="assets/roll-palta.jpg" alt="" width="420" height="420"></figure>
+      <figure class="d"><img src="assets/roll-salmon.jpg" alt="" width="420" height="420"></figure>
+      <figure class="e"><img src="assets/roll-nori.jpg" alt="" width="420" height="420"></figure>
     </div>
   </div>
 </div>
@@ -322,7 +346,12 @@ footer .sep{margin:0 8px;color:var(--linea2)}
       <p>Toca <b>Agregar</b> en lo que quieras. Al final revisas el pedido y lo envías por WhatsApp con un solo toque.</p>
       <p class="aviso-verdura"><b>Verdura opcional: cualquier cambio, avísanos al hacer tu pedido.</b></p>
     </div>
-    <div class="tabs" id="tabs"></div>
+    <div class="buscador">
+      <input type="search" id="buscar" placeholder="Buscar en la carta: salmón, palta, vegano…" aria-label="Buscar en la carta" autocomplete="off" enterkeyhint="search">
+      <button type="button" id="buscarX" aria-label="Borrar búsqueda" hidden>&times;</button>
+    </div>
+    <p class="busq-info" id="busqInfo" aria-live="polite"></p>
+    <nav class="tabs" id="tabs" aria-label="Categorías de la carta"></nav>
     <div id="menu"></div>
   </div>
 </section>
@@ -353,9 +382,11 @@ footer .sep{margin:0 8px;color:var(--linea2)}
   </div>
 </section>
 
+</main>
+
 <footer>
   <div class="wrap">
-    <img src="assets/logo.png" alt="Viva Sushi">
+    <img src="assets/logo.png" alt="Viva Sushi" width="1138" height="435" loading="lazy">
     <p>Santa Rosa #8689, San Ramón<span class="sep">·</span>Martes a sábado 13:00–22:00</p>
     <p style="margin-top:7px"><a href="https://wa.me/56997887871">+56 9 9788 7871</a></p>
   </div>
@@ -363,12 +394,12 @@ footer .sep{margin:0 8px;color:var(--linea2)}
 
 <div class="bar" id="bar">
   <div class="wrap bar-in">
-    <div class="bar-icono"><svg class="bolsa" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8zm3.5 0a3.5 3.5 0 0 1 7 0"/></svg><span class="globo" id="barCount">0</span></div>
+    <div class="bar-icono"><svg class="bolsa" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8zm3.5 0a3.5 3.5 0 0 1 7 0"/></svg><span class="globo" id="barCount" aria-hidden="true">0</span></div>
     <div class="bar-info">
-      <b id="barTotal">$0</b>
-      <button class="bar-open" id="barOpen">Ver mi pedido</button>
+      <b id="barTotal" aria-live="polite">$0</b>
+      <button type="button" class="bar-open" id="barOpen">Ver mi pedido</button>
     </div>
-    <button class="btn btn-wa" id="barGo">
+    <button type="button" class="btn btn-wa" id="barGo">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
       Pedir
     </button>
@@ -376,50 +407,54 @@ footer .sep{margin:0 8px;color:var(--linea2)}
 </div>
 
 <div class="modal" id="modal">
-  <div class="sheet">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitulo" tabindex="-1">
     <div class="sheet-head">
       <img src="assets/logo.png" alt="">
-      <h3>TU PEDIDO</h3>
-      <button class="x" id="close" aria-label="Cerrar">&times;</button>
+      <h3 id="mTitulo">TU PEDIDO</h3>
+      <button type="button" class="x" id="close" aria-label="Cerrar">&times;</button>
     </div>
+    <p class="cerrado-aviso" id="avisoCerrado" role="status"></p>
     <div id="lines"></div>
+    <button type="button" class="vaciar" id="vaciar">Vaciar pedido</button>
     <div class="total"><span>Total</span><span class="tv" id="mTotal">$0</span></div>
 
     <div class="fsec">
       <div class="fsec-h">Tus datos</div>
       <div class="grid2">
-        <div class="field"><label>Nombre <span class="req">*</span></label><input id="nombre" placeholder="Camila Rojas" autocomplete="name"></div>
-        <div class="field"><label>Contacto <span class="req">*</span></label>
+        <div class="field"><label for="nombre">Nombre <span class="req">*</span></label><input id="nombre" placeholder="Camila Rojas" autocomplete="name"></div>
+        <div class="field"><label for="telNum">Contacto <span class="req">*</span></label>
           <div class="telrow">
             <span class="telpfx">+56&nbsp;9</span>
-            <input id="telNum" type="tel" inputmode="numeric" maxlength="8" placeholder="1234 5678" autocomplete="tel-national">
+            <input id="telNum" type="tel" inputmode="numeric" placeholder="1234 5678" autocomplete="tel-national">
           </div>
         </div>
       </div>
-      <div class="field"><label>Dirección <span class="opt">(solo si es despacho)</span></label><input id="direccion" placeholder="Calle y número, depto, comuna" autocomplete="street-address"></div>
+      <div class="field" id="campoDireccion"><label for="direccion">Dirección <span class="opt">(solo si es despacho)</span></label><input id="direccion" placeholder="Calle y número, depto, comuna" autocomplete="street-address"></div>
     </div>
 
     <div class="fsec">
       <div class="fsec-h">Entrega y extras</div>
       <div class="field">
-        <label>¿Cómo lo quieres?</label>
-        <div class="seg" id="modo">
+        <label id="lblModo">¿Cómo lo quieres?</label>
+        <div class="seg" id="modo" role="group" aria-labelledby="lblModo">
           <button type="button" class="on" data-m="Para llevar">Para llevar</button>
           <button type="button" data-m="Para servir">Para servir</button>
         </div>
       </div>
       <div class="grid3">
-        <div class="field"><label>Salsa soya</label><select id="salsaSoya" class="num"></select></div>
-        <div class="field"><label>Salsa teriyaki</label><select id="salsaTeriyaki" class="num"></select></div>
-        <div class="field"><label>Palitos <span class="opt">(pares)</span></label><select id="palitos" class="num"></select></div>
+        <div class="field"><label for="salsaSoya">Salsa soya</label><select id="salsaSoya" class="num"></select></div>
+        <div class="field"><label for="salsaTeriyaki">Salsa teriyaki</label><select id="salsaTeriyaki" class="num"></select></div>
+        <div class="field"><label for="palitos">Palitos <span class="opt">(pares)</span></label><select id="palitos" class="num"></select></div>
       </div>
+      <p class="pista" id="pistaSalsas" role="status"></p>
+      <p class="pista" id="pistaPalitos" role="status"></p>
     </div>
 
     <div class="fsec">
       <div class="fsec-h">Pago</div>
       <div class="field">
-        <label>Medio de pago <span class="req">*</span></label>
-        <div class="seg seg-wrap" id="pago">
+        <label id="lblPago">Medio de pago <span class="req">*</span></label>
+        <div class="seg seg-wrap" id="pago" role="group" aria-labelledby="lblPago">
           <button type="button" data-v="Efectivo">Efectivo</button>
           <button type="button" data-v="Débito">Débito</button>
           <button type="button" data-v="Crédito">Crédito</button>
@@ -428,11 +463,11 @@ footer .sep{margin:0 8px;color:var(--linea2)}
           <button type="button" data-v="Edenred">Edenred</button>
         </div>
       </div>
-      <div class="field"><label>Comentarios <span class="opt">(opcional)</span></label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00…"></textarea></div>
+      <div class="field"><label for="nota">Comentarios <span class="opt">(opcional)</span></label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00…"></textarea></div>
     </div>
 
     <div id="sendWrap">
-      <p class="err" id="err"></p>
+      <p class="err" id="err" role="alert"></p>
       <button type="button" class="btn btn-wa" id="send">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
         Enviar pedido por WhatsApp
@@ -440,13 +475,15 @@ footer .sep{margin:0 8px;color:var(--linea2)}
       <p class="aviso">Se abre WhatsApp con tu pedido ya escrito. El pedido queda confirmado cuando el local te responde.</p>
     </div>
 
-    <div class="done" id="done">
+    <div class="done" id="done" tabindex="-1">
       <p class="done-t">Tu pedido está listo</p>
+      <p class="cerrado-aviso" id="avisoCerrado2"></p>
       <a class="btn btn-wa" id="waLink" href="#" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.5-1.2-2.9s.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3.1.1.1.6-.1 1.2z"/></svg>
         Abrir WhatsApp y enviar
       </a>
       <button type="button" class="btn btn-ghost" id="copyBtn">Copiar pedido</button>
+      <button type="button" class="vaciar" id="nuevo">Empezar un pedido nuevo</button>
       <p class="aviso">Si WhatsApp no se abrió solo, toca <b>“Abrir WhatsApp y enviar”</b>. O copia el pedido y mándalo al <b>+56 9 9788 7871</b>.</p>
     </div>
   </div>
