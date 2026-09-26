@@ -92,6 +92,6 @@ Nigiri y Sashimi · Entradas y salsas · Arma tu roll
 - [ ] Definir si existen los productos **E12** y **E17** (la carta salta de E11 a E13 y de E16 a E18).
 - [ ] Agregar sección de bebidas si corresponde.
 
-## Salsas extra
+## Salsas incluidas y salsas extra
 
-Cada promo VIVA incluye N salsas a elección (soya o teriyaki; sale de la frase `N salsas a elección` en su descripción). Cada salsa de más se cobra `SALSA_EXTRA` ($500) y se suma al total del pedido y al mensaje de WhatsApp. Un pedido sin ninguna promo VIVA no cobra salsas mientras `COBRAR_SALSAS_SIN_PROMO = false` (ambas constantes están arriba en `index.html`; `MAX_SALSAS` es el tope del selector por tipo).
+El pedido separa dos bloques: **Salsas incluidas** (aparece solo si hay una promo VIVA; el máximo es lo que suman las promos del pedido, tomado de la frase `N salsas a elección` de su descripción, y soya + teriyaki nunca pasan de ese número) y **Salsas extra** (`SALSA_EXTRA` = $500 cada una, se suman al total y al mensaje de WhatsApp). Sin ninguna promo VIVA no se cobran salsas mientras `COBRAR_SALSAS_SIN_PROMO = false`. `MAX_SALSAS` es el tope de extras por tipo. Las constantes están arriba en `index.html`.

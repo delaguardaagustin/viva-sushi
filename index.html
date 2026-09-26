@@ -256,6 +256,11 @@ section{scroll-margin-top:74px}
 .sheet:focus{outline:none}
 .cerrado-aviso{display:none;margin:0 0 16px;padding:12px 15px;border-radius:6px;font-size:15px;line-height:1.5;color:var(--papel);background:var(--sumi3);border:1px solid var(--rojo-vivo)}
 .cerrado-aviso.show{display:block}
+.sub-h{margin:18px 0 8px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--papel)}
+.sub-h small{font-weight:500;letter-spacing:0;text-transform:none;color:var(--papel2)}
+.salsas-box{margin-top:6px;padding:0 0 4px}
+.salsas-box[hidden]{display:none}
+.salsas-box .grid2{grid-template-columns:1fr 1fr}
 .pista{display:none;margin-top:12px;font-size:14.5px;line-height:1.5;color:var(--papel2)}
 .pista.show{display:block}
 .pista b{color:var(--papel)}
@@ -478,12 +483,25 @@ footer .sep{margin:0 8px;color:var(--linea2)}
           <button type="button" data-m="Para servir">Para servir</button>
         </div>
       </div>
-      <div class="grid3">
-        <div class="field"><label for="salsaSoya">Salsa soya</label><select id="salsaSoya" class="num"></select></div>
-        <div class="field"><label for="salsaTeriyaki">Salsa teriyaki</label><select id="salsaTeriyaki" class="num"></select></div>
+      <div class="salsas-box" id="salsasIncBox" hidden>
+        <div class="sub-h" id="lblSalsasInc">Salsas incluidas en tu pedido <small id="incN"></small></div>
+        <div class="grid2">
+          <div class="field"><label for="salsaSoya">Soya</label><select id="salsaSoya" class="num"></select></div>
+          <div class="field"><label for="salsaTeriyaki">Teriyaki</label><select id="salsaTeriyaki" class="num"></select></div>
+        </div>
+        <p class="pista" id="pistaSalsas" role="status"></p>
+      </div>
+      <div class="salsas-box" id="salsasExtraBox">
+        <div class="sub-h" id="lblSalsasExtra">Salsas extra <small id="extraP"></small></div>
+        <div class="grid2">
+          <div class="field"><label for="salsaSoyaX">Soya extra</label><select id="salsaSoyaX" class="num"></select></div>
+          <div class="field"><label for="salsaTeriyakiX">Teriyaki extra</label><select id="salsaTeriyakiX" class="num"></select></div>
+        </div>
+        <p class="pista" id="pistaExtra" role="status"></p>
+      </div>
+      <div class="grid2">
         <div class="field"><label for="palitos">Palitos <span class="opt">(pares)</span></label><select id="palitos" class="num"></select></div>
       </div>
-      <p class="pista" id="pistaSalsas" role="status"></p>
       <p class="pista" id="pistaPalitos" role="status"></p>
     </div>
 
@@ -1015,11 +1033,13 @@ if ("IntersectionObserver" in window) {
 }
 
 var bar = document.getElementById("bar");
+function valSel(id){ return (+document.getElementById(id).value) || 0; }
 function salsasCobro(){
   var inc = salsasIncluidas();
-  var el = (+document.getElementById("salsaSoya").value) + (+document.getElementById("salsaTeriyaki").value);
-  var extra = (inc > 0 || COBRAR_SALSAS_SIN_PROMO) ? Math.max(0, el - inc) : 0;
-  return { inc: inc, el: el, extra: extra, monto: extra * SALSA_EXTRA };
+  var incEl = inc > 0 ? valSel("salsaSoya") + valSel("salsaTeriyaki") : 0;
+  var ext = valSel("salsaSoyaX") + valSel("salsaTeriyakiX");
+  var extra = (inc > 0 || COBRAR_SALSAS_SIN_PROMO) ? ext : 0;
+  return { inc: inc, el: incEl, ext: ext, extra: extra, monto: extra * SALSA_EXTRA };
 }
 function totalFinal(){ return totals().t + salsasCobro().monto; }
 function totals(){
@@ -1092,18 +1112,51 @@ function salsasIncluidas(){
   }
   return n;
 }
+function llenarSel(id, max, val){
+  var sel = document.getElementById(id);
+  sel.innerHTML = "";
+  for (var i = 0; i <= max; i++) { var o = document.createElement("option"); o.value = i; o.textContent = i; sel.appendChild(o); }
+  sel.value = String(Math.min(val, max));
+}
+/* Las salsas incluidas (soya + teriyaki) nunca pueden pasar de las que trae la promo */
+function ajustarSalsas(){
+  var inc = salsasIncluidas();
+  var box = document.getElementById("salsasIncBox");
+  box.hidden = inc <= 0;
+  var s = inc > 0 ? valSel("salsaSoya") : 0, t = inc > 0 ? valSel("salsaTeriyaki") : 0;
+  if (s > inc) s = inc;
+  if (s + t > inc) t = Math.max(0, inc - s);
+  llenarSel("salsaSoya", inc - t, s);
+  llenarSel("salsaTeriyaki", inc - s, t);
+  document.getElementById("incN").textContent = inc > 0 ? "(tu pedido trae " + inc + ")" : "";
+  var ext = document.getElementById("extraP"), lbl = document.getElementById("lblSalsasExtra");
+  if (inc > 0 || COBRAR_SALSAS_SIN_PROMO) { lbl.firstChild.nodeValue = "Salsas extra "; ext.textContent = "(" + clp(SALSA_EXTRA) + " cada una, aparte de las incluidas)"; }
+  else { lbl.firstChild.nodeValue = "Salsas "; ext.textContent = ""; }
+}
 function pintarPistas(){
+  ajustarSalsas();
   var c = salsasCobro();
   var inc = c.inc, elegidas = c.el;
   var ps = document.getElementById("pistaSalsas");
   var faltan = inc - elegidas;
   if (inc > 0 && faltan > 0) {
-    ps.innerHTML = "Tu pedido incluye <b>" + inc + (inc === 1 ? " salsa" : " salsas") + " a elección</b> (soya o teriyaki). Elígelas arriba para que sepamos cuáles poner; te " + (faltan === 1 ? "falta 1" : "faltan " + faltan) + ". Cada salsa extra cuesta <b>" + clp(SALSA_EXTRA) + "</b>.";
+    ps.innerHTML = "Elige cuáles quieres (soya o teriyaki): te " + (faltan === 1 ? "falta 1" : "faltan " + faltan) + ". Estas ya vienen <b>incluidas</b>, no tienen costo.";
     ps.classList.add("show");
-  } else if (c.extra > 0) {
-    ps.innerHTML = "Salsas extra: <b>" + c.extra + " × " + clp(SALSA_EXTRA) + " = " + clp(c.monto) + "</b> (ya sumado al total)." + (inc > 0 ? " Tu pedido incluye " + inc + (inc === 1 ? " salsa." : " salsas.") : "");
+  } else if (inc > 0) {
+    ps.innerHTML = "Listo: tus salsas incluidas, sin costo.";
     ps.classList.add("show");
   } else { ps.classList.remove("show"); ps.textContent = ""; }
+  var px = document.getElementById("pistaExtra");
+  if (c.extra > 0) {
+    px.innerHTML = "Extras: <b>" + c.extra + " × " + clp(SALSA_EXTRA) + " = " + clp(c.monto) + "</b>, ya sumado al total.";
+    px.classList.add("show");
+  } else if (inc > 0) {
+    px.innerHTML = "Opcional: solo si quieres más de las incluidas.";
+    px.classList.add("show");
+  } else if (!COBRAR_SALSAS_SIN_PROMO) {
+    px.innerHTML = "Las promos VIVA incluyen salsas; en otros pedidos el local te confirma si tienen costo.";
+    px.classList.add("show");
+  } else { px.classList.remove("show"); px.textContent = ""; }
   document.getElementById("mTotal").textContent = clp(totalFinal());
   var pp = document.getElementById("pistaPalitos");
   if (document.getElementById("palitos").value === "0") {
@@ -1256,16 +1309,13 @@ document.getElementById("modo").addEventListener("click", function(e){
   modo = b.dataset.m;
 });
 
-/* opciones para salsas (0 a 3 de cada una) y palitos (0 a 10) */
-[["salsaSoya", MAX_SALSAS], ["salsaTeriyaki", MAX_SALSAS], ["palitos", 10]].forEach(function(par){
-  var sel = document.getElementById(par[0]);
-  for (var i = 0; i <= par[1]; i++) {
-    var o = document.createElement("option");
-    o.value = i; o.textContent = i;
-    sel.appendChild(o);
-  }
+["salsaSoyaX", "salsaTeriyakiX"].forEach(function(id){ llenarSel(id, MAX_SALSAS, 0); document.getElementById(id).addEventListener("change", pintarPistas); });
+["salsaSoya", "salsaTeriyaki"].forEach(function(id){ document.getElementById(id).addEventListener("change", pintarPistas); });
+(function(){
+  var sel = document.getElementById("palitos");
+  for (var i = 0; i <= 10; i++) { var o = document.createElement("option"); o.value = i; o.textContent = i; sel.appendChild(o); }
   sel.addEventListener("change", pintarPistas);
-});
+})();
 
 /* teléfono: solo dígitos, 8 como máximo (el +56 9 es fijo).
    Acepta que peguen el número completo: +56 9 1234 5678, 56912345678, 912345678 */
@@ -1318,13 +1368,11 @@ document.getElementById("send").onclick = function(){
   var nombre     = document.getElementById("nombre").value.trim();
   var contacto   = document.getElementById("telNum").value.replace(/\D/g, "");
   var direccion  = PEDIR_DIRECCION ? document.getElementById("direccion").value.trim() : "";
-  var soya       = +document.getElementById("salsaSoya").value;
-  var teriyaki   = +document.getElementById("salsaTeriyaki").value;
   var palitos    = document.getElementById("palitos").value;
-  var salsasParts = [];
-  if (soya)     salsasParts.push(soya + " soya");
-  if (teriyaki) salsasParts.push(teriyaki + " teriyaki");
-  var salsasTxt = salsasParts.length ? salsasParts.join(", ") : "0";
+  function parteSalsas(a, b){ var r = []; if (a) r.push(a + " soya"); if (b) r.push(b + " teriyaki"); return r.join(", "); }
+  var scS = salsasCobro();
+  var incTxt = scS.inc > 0 ? parteSalsas(valSel("salsaSoya"), valSel("salsaTeriyaki")) : "";
+  var extTxt = parteSalsas(valSel("salsaSoyaX"), valSel("salsaTeriyakiX"));
   var nota       = document.getElementById("nota").value.trim();
 
   if (!nombre)              { fail("Escribe tu nombre para el pedido.", document.getElementById("nombre")); return; }
@@ -1350,7 +1398,9 @@ document.getElementById("send").onclick = function(){
   L.push("Contacto: " + telFmt);
   L.push("Modalidad: " + modo);
   if (PEDIR_DIRECCION && direccion) L.push("Dirección: " + direccion);
-  L.push("Salsas: " + salsasTxt + (sc.inc > 0 ? " (incluidas " + sc.inc + ")" : ""));
+  if (sc.inc > 0) L.push("Salsas incluidas (" + sc.inc + "): " + (incTxt || "sin elegir"));
+  if (extTxt) L.push(sc.inc > 0 || COBRAR_SALSAS_SIN_PROMO ? "Salsas extra: " + extTxt + " (" + sc.extra + " x " + clp(SALSA_EXTRA) + ")" : "Salsas: " + extTxt);
+  if (!sc.inc && !extTxt) L.push("Salsas: 0");
   L.push("Palitos: " + palitos + " par(es)");
   L.push("Medio de pago: " + pago);
   if (nota) L.push("Comentario: " + nota);
