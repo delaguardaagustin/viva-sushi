@@ -286,6 +286,42 @@ footer .sep{margin:0 8px;color:var(--linea2)}
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s cubic-bezier(.16,1,.3,1)}
 .reveal.visible{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}.reveal{opacity:1;transform:none}html{scroll-behavior:auto}}
+
+/* ---------- ASISTENTE (chat por reglas, todo en el navegador) ---------- */
+.ay-btn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:58;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 18px;border-radius:999px;border:1px solid var(--rojo-vivo);background:var(--rojo);color:var(--papel);font:700 15.5px var(--font);cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.ay-btn:hover{filter:brightness(1.12)}
+.ay-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ay-panel{--ay-b:16px;position:fixed;right:16px;bottom:calc(var(--ay-b) + env(safe-area-inset-bottom));z-index:58;width:min(400px,calc(100vw - 24px));height:min(600px,calc(100vh - var(--ay-b) - 84px));height:min(600px,calc(100dvh - var(--ay-b) - 84px));display:flex;flex-direction:column;background:var(--sumi2);color:var(--papel);border:1px solid var(--linea2);border-radius:12px;box-shadow:0 16px 48px rgba(0,0,0,.65);overflow:hidden}
+.bar.show ~ .ay-btn{bottom:calc(88px + env(safe-area-inset-bottom))}
+.bar.show ~ .ay-panel{--ay-b:88px}
+.modal.show ~ .ay-btn,.modal.show ~ .ay-panel{display:none}
+@media(max-width:480px){.ay-btn,.ay-panel{right:12px}}
+.ay-head{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px;border-bottom:1px solid var(--linea);background:var(--sumi)}
+.ay-head h2{flex:1;font-family:var(--display);font-weight:400;font-size:17px;line-height:1.2}
+.ay-x{width:44px;height:44px;border:0;background:none;color:var(--papel);font-size:28px;line-height:1;cursor:pointer;border-radius:6px}
+.ay-x:hover{color:var(--rojo-vivo)}
+.ay-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;position:relative;overscroll-behavior:contain}
+.ay-msg{max-width:92%;padding:10px 13px;border-radius:12px;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.ay-msg.bot{align-self:flex-start;background:var(--sumi3);border:1px solid var(--linea);border-top-left-radius:3px}
+.ay-msg.user{align-self:flex-end;background:var(--rojo);color:var(--papel);border-top-right-radius:3px}
+.ay-msg p+p{margin-top:6px}
+.ay-card{margin-top:9px;padding:10px 11px;background:var(--sumi);border:1px solid var(--linea);border-radius:8px}
+.ay-card-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.ay-card b{font-weight:700}
+.ay-card .ay-p{color:var(--papel);font-weight:700;white-space:nowrap}
+.ay-card p{color:var(--papel2);font-size:14px;margin-top:3px}
+.ay-card .btn{margin-top:8px}
+.ay-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+.btn.ay-b{min-height:40px;padding:0 14px;font-size:14.5px}
+.ay-chips{display:flex;gap:8px;overflow-x:auto;padding:8px 12px;border-top:1px solid var(--linea);scrollbar-width:thin}
+.ay-chip{flex:none;min-height:40px;padding:0 13px;border:1px solid var(--linea2);border-radius:999px;background:transparent;color:var(--papel);font:500 14.5px var(--font);cursor:pointer;white-space:nowrap}
+.ay-chip:hover{border-color:var(--rojo-vivo);color:var(--rojo-vivo)}
+.ay-msg .ay-chips{border:0;padding:9px 0 0;flex-wrap:wrap;overflow:visible}
+.ay-form{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid var(--linea)}
+.ay-form input{flex:1;min-width:0;min-height:44px;padding:0 12px;border-radius:6px;border:1px solid var(--linea2);background:var(--sumi);color:var(--papel);font:16px var(--font)}
+.ay-form input::placeholder{color:var(--papel2)}
+.ay-form .btn{min-height:44px;padding:0 16px}
+.ay-nota{font-size:12.5px;color:var(--papel2);margin-top:6px}
 </style>
 </head>
 <body>
@@ -1347,6 +1383,389 @@ if (!PEDIR_DIRECCION) document.getElementById("campoDireccion").hidden = true;
 pintarEstado();
 setInterval(pintarEstado, 60000);
 updateBar();
+
+/* ============================================================
+   ASISTENTE DE AYUDA (chat por reglas + busqueda en CARTA)
+   No es una IA: no usa servidores ni claves, no envia ni guarda nada.
+   La conversacion vive solo en la memoria de la pagina.
+   Para agregar respuestas: ver "AYUDA_INTENTS" mas abajo.
+   ============================================================ */
+var AYUDA_SALUDO = "Soy el asistente automático de Viva Sushi. Te ayudo con la carta y tu pedido; para todo lo demás te derivo al WhatsApp del local.";
+var AYUDA_CHIPS = ["¿Están abiertos?", "¿Dónde están?", "Medios de pago", "Recomiéndame algo", "Promos para grupo", "Armar mi pedido", "Hablar con el local"];
+var AYUDA_PIEZAS_PERSONA = 10;   /* guia para "promos para N personas" */
+var AYUDA_STOP = " que lleva llevan cuanto cuesta cuestan vale valen precio precios tienen tiene tienes hay la el los las un una de del con para es son me quiero quisiera saber cual cuales ingredientes y en a por favor hola sushi roll rolls venden ";
+/* grupos de sinonimos (sin tildes): buscar uno equivale a buscar cualquiera */
+var AYUDA_SIN = [["camaron", "ebi"], ["salmon", "sake"], ["pulpo", "tako"], ["pollo", "tory"], ["kanikama", "kani"], ["palta", "avocado"], ["queso", "cheese"], ["frito", "furai", "tempura", "apanado", "tempurizado"], ["carne", "beef", "mechada"], ["vegetariano", "vegeta", "vegano"]];
+
+var ayuda = { btn: null, panel: null, log: null, input: null, listo: false, idx: null };
+
+function ayLimpia(s){ return norm(s).replace(/[¿?¡!.,;:()"]/g, " ").replace(/\s+/g, " ").trim(); }
+function ayEl(tag, cls, txt){ var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+function ayWaUrl(txt){ return "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(txt); }
+function ayMapsUrl(){ var a = document.querySelector('a[href*="google.com/maps"]'); return a ? a.href : "https://www.google.com/maps/search/?api=1&query=Santa+Rosa+8689+San+Ram%C3%B3n+Santiago"; }
+function ayLev(a, b){
+  if (Math.abs(a.length - b.length) > 2) return 9;
+  var p = [], i, j;
+  for (j = 0; j <= b.length; j++) p[j] = j;
+  for (i = 1; i <= a.length; i++) {
+    var c = [i];
+    for (j = 1; j <= b.length; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    p = c;
+  }
+  return p[b.length];
+}
+
+/* indice de la carta (se arma la primera vez que se usa) */
+function ayIndice(){
+  if (ayuda.idx) return ayuda.idx;
+  var r = [];
+  CARTA.forEach(function(c, ci){ c.items.forEach(function(it, ii){
+    var nombre = ayLimpia(it.n), desc = ayLimpia((it.d || "") + " " + c.cat);
+    r.push({ key: ci + "-" + ii, it: it, cat: c.cat, nombre: nombre, nw: nombre.split(" "), dw: desc.split(" "),
+             texto: ayLimpia(c.cat + " " + it.n + " " + (it.d || "")) });
+  }); });
+  ayuda.idx = r;
+  return r;
+}
+
+/* ---------- construccion de mensajes ---------- */
+function ayMsg(quien){
+  var m = ayEl("div", "ay-msg " + quien);
+  ayuda.log.appendChild(m);
+  return m;
+}
+function ayScroll(m){ ayuda.log.scrollTop = m ? Math.max(0, m.offsetTop - 8) : ayuda.log.scrollHeight; }
+function ayBtn(txt, clase, fn, aria){
+  var b = ayEl("button", "btn ay-b " + clase, txt); b.type = "button";
+  if (aria) b.setAttribute("aria-label", aria);
+  b.onclick = fn; return b;
+}
+function ayLink(txt, href, clase){
+  var a = ayEl("a", "btn ay-b " + clase, txt); a.href = href; a.target = "_blank"; a.rel = "noopener"; return a;
+}
+function ayWaBtn(txt){ return ayLink("Abrir WhatsApp", ayWaUrl(txt || "Hola, tengo una consulta desde la página de pedidos."), "btn-wa"); }
+function ayChips(lista){
+  var w = ayEl("div", "ay-chips");
+  lista.forEach(function(t){
+    var c = ayEl("button", "ay-chip", t); c.type = "button";
+    c.onclick = function(){ ayEnviar(t); };
+    w.appendChild(c);
+  });
+  return w;
+}
+/* respuesta del asistente: parrafos + nodos extra (tarjetas, botones, chips) */
+function ayResponde(parrafos, extras){
+  var m = ayMsg("bot");
+  [].concat(parrafos).forEach(function(t){ m.appendChild(ayEl("p", "", t)); });
+  (extras || []).forEach(function(x){ if (x) m.appendChild(x); });
+  ayScroll(m);
+  return m;
+}
+function ayActs(){ var d = ayEl("div", "ay-acts"); [].slice.call(arguments).forEach(function(x){ if (x) d.appendChild(x); }); return d; }
+
+function ayCard(e, extra){
+  var c = ayEl("div", "ay-card"), top = ayEl("div", "ay-card-top");
+  top.appendChild(ayEl("b", "", e.it.n));
+  top.appendChild(ayEl("span", "ay-p", clp(e.it.p)));
+  c.appendChild(top);
+  var d = e.it.d || "";
+  if (d) c.appendChild(ayEl("p", "", d.length > 130 ? d.slice(0, 127).replace(/\s+\S*$/, "") + "…" : d));
+  if (extra) c.appendChild(ayEl("p", "", extra));
+  c.appendChild(ayBtn("Agregar al pedido", "btn-rojo", function(){ ayAgregar(e); }, "Agregar al pedido: " + e.it.n));
+  return c;
+}
+function ayAgregar(e){
+  var antes = cart[e.key] ? cart[e.key].q : 0;
+  addItem(e.key, e.it);
+  refreshControl(e.key, e.it);
+  var r = totals();
+  if (antes >= 99) ayResponde("Ya tienes el máximo (99) de " + e.it.n + ".");
+  else ayResponde("Agregué 1x " + e.it.n + ". Llevas " + r.n + (r.n === 1 ? " producto" : " productos") + " por " + clp(r.t) + ".",
+    [ayActs(ayBtn("Ver mi pedido", "btn-ghost", ayVerPedido))]);
+}
+function ayVerPedido(){
+  if (!totals().n) { ayResponde("Tu pedido está vacío. Agrega productos con «Agregar al pedido» o desde la carta.", [ayChips(["Recomiéndame algo", "Promos para grupo"])]); return; }
+  ayCerrar(true);
+  openModal();
+}
+
+/* ---------- busqueda aproximada en la carta ---------- */
+function ayTokens(q){
+  return ayLimpia(q).split(" ").filter(function(t){ return t && AYUDA_STOP.indexOf(" " + t + " ") < 0; });
+}
+function ayAlts(t){
+  var r = [t];
+  if (t.length > 4 && /es$/.test(t)) r.push(t.slice(0, -2));
+  if (t.length > 3 && /s$/.test(t)) r.push(t.slice(0, -1));
+  r.slice().forEach(function(a){
+    AYUDA_SIN.forEach(function(g){ if (g.indexOf(a) > -1) g.forEach(function(x){ if (r.indexOf(x) < 0) r.push(x); }); });
+  });
+  return r;
+}
+function ayHit(words, a, fuzzy){
+  for (var i = 0; i < words.length; i++) {
+    var w = words[i];
+    if (w === a || (a.length >= 3 && w.indexOf(a) === 0)) return true;
+    if (fuzzy && a.length >= 5 && w.length >= 4 && ayLev(w, a) <= (a.length >= 8 ? 2 : 1)) return true;
+  }
+  return false;
+}
+/* devuelve { lista, tope } ordenado por puntaje, o null si la consulta no tiene palabras utiles */
+function ayBuscar(q){
+  var tk = ayTokens(q);
+  if (!tk.length) return null;
+  var necesarios = tk.length > 2 ? tk.length - 1 : tk.length, res = [];
+  ayIndice().forEach(function(e){
+    var ok = 0, pts = 0;
+    tk.forEach(function(t){
+      var mejor = 0;
+      ayAlts(t).forEach(function(a){
+        if (ayHit(e.nw, a, false)) mejor = Math.max(mejor, 3);
+        else if (ayHit(e.dw, a, false)) mejor = Math.max(mejor, 1.5);
+        else if (ayHit(e.nw, a, true)) mejor = Math.max(mejor, 2);
+        else if (ayHit(e.dw, a, true)) mejor = Math.max(mejor, 1);
+      });
+      if (mejor) { ok++; pts += mejor; }
+    });
+    if (ok >= necesarios) res.push({ e: e, pts: pts });
+  });
+  res.sort(function(a, b){ return b.pts - a.pts; });
+  return { lista: res.map(function(x){ return x.e; }), tope: res.map(function(x){ return x.pts; }) };
+}
+/* hasta n resultados, priorizando categorias distintas */
+function ayElige(lista, n){
+  var vistos = {}, r = [];
+  lista.forEach(function(e){ if (r.length < n && !vistos[e.cat]) { vistos[e.cat] = 1; r.push(e); } });
+  lista.forEach(function(e){ if (r.length < n && r.indexOf(e) < 0) r.push(e); });
+  return r;
+}
+function ayRango(e){ return e.it.tag === "Popular" ? 0 : e.it.tag === "Recomendado" ? 1 : e.it.tag === "Nuevo" ? 2 : 3; }
+
+function ayResponderBusqueda(q){
+  var t = ayLimpia(q), m = /\bviva\s*0*(\d+)\b/.exec(t), lista, total;
+  if (m) {
+    lista = ayIndice().filter(function(e){ return e.cat === "Promociones VIVA" && new RegExp("^viva " + m[1] + "\\b").test(e.nombre); });
+    total = lista.length;
+  } else {
+    var r = ayBuscar(t);
+    if (r === null) { ayResponde("¿Qué producto buscas? Escribe su nombre o un ingrediente, por ejemplo «qué lleva el E2» o «tienen camarón».", [ayChips(["Recomiéndame algo", "Promos para grupo"])]); return true; }
+    var top = r.tope[0], mejores = r.lista.filter(function(e, i){ return r.tope[i] === top; });
+    lista = mejores.length >= 3 ? ayElige(mejores, 3) : r.lista.slice(0, 3);
+    total = r.lista.length;
+  }
+  if (!lista.length) return false;
+  ayResponde(total > lista.length ? "Encontré " + total + " en la carta; te muestro " + lista.length + ". Puedes ver el resto con el buscador de la carta." : "Esto encontré en la carta:",
+    lista.map(function(e){ return ayCard(e); }));
+  return true;
+}
+
+/* ---------- recomendaciones (solo con datos reales de la carta) ---------- */
+var AYUDA_NO_PESCADO = /\b(salmon|sake|pescado|sashimi|ceviche|acevichad\w*|masago|atun)\b/;
+var AYUDA_CARNE = /\b(pollo|tory|carne|mechada|beef|cerdo|camaron\w*|ebi|salmon|sake|pescado|kani|kanikama|pulpo|tako|masago|sashimi|ceviche|acevichad\w*|atun|gohan|nigiri)\b/;
+var AYUDA_VEG = /\b(palmito|choclo|champinon\w*|palta|vegeta|vegano|seitan|pimenton|verduras|queso)\b/;
+var AYUDA_PREFS = [
+  { re: /vegano/, nombre: "veganos", f: function(e){ return e.cat === "Rolls veganos"; } },
+  { re: /vegetarian/, nombre: "vegetarianos", nota: "Los elegí porque en su descripción no aparece carne, pollo, pescado ni mariscos. Si es una restricción estricta, confírmalo con el local.", f: function(e){ return e.it.d && !AYUDA_CARNE.test(e.texto) && AYUDA_VEG.test(e.texto); }, solo: true },
+  { re: /sin (pescado|crudo|salmon)|no (me gusta|como|quiero) (el )?(pescado|crudo|salmon)/, nombre: "sin pescado", nota: "La carta no indica qué va crudo o cocido: te muestro los que no mencionan salmón, pescado ni ceviche en su descripción. Confirma con el local.", f: function(e){ return e.it.d && !AYUDA_NO_PESCADO.test(e.texto); }, solo: true },
+  { re: /camaron|ebi/, nombre: "con camarón", f: function(e){ return /camaron|\bebi\b/.test(e.texto); } },
+  { re: /apanad|frit|tempura|furai|crocante/, nombre: "apanados o fritos", f: function(e){ return /apanad|frit|tempura|furai|tempuriz|panko/.test(e.texto); } },
+  { re: /palta|avocado/, nombre: "con palta", f: function(e){ return /palta|avocado/.test(e.texto); } },
+  { re: /queso crema|cheese/, nombre: "con queso crema", f: function(e){ return /queso crema|cheese/.test(e.texto); } },
+  { re: /pollo|tory/, nombre: "con pollo", f: function(e){ return /pollo|\btory\b/.test(e.texto); } },
+  { re: /carne|mechada|beef/, nombre: "con carne", f: function(e){ return /carne|mechada|beef/.test(e.texto); } },
+  { re: /salmon|sake/, nombre: "con salmón", f: function(e){ return /salmon|\bsake\b/.test(e.texto); } },
+  { re: /pulpo|tako/, nombre: "con pulpo", f: function(e){ return /pulpo|\btako\b/.test(e.texto); } },
+  { re: /picante|spicy/, nombre: "picantes", f: function(e){ return /spicy|picante/.test(e.texto); } }
+];
+var AYUDA_PREF_CHIPS = ["Vegetariano", "Sin pescado crudo", "Con camarón", "Apanado o frito", "Con palta", "Con queso crema", "Económico", "Popular"];
+
+function ayRecomendar(t){
+  var pref = [], notas = [], eco = /barat|economic|precio bajo|menos plata|presupuesto/.test(t), pop = /popular|mas vendido|favorito|recomendado|estrella/.test(t);
+  AYUDA_PREFS.forEach(function(p){ if (p.re.test(t)) pref.push(p); });
+  if (!pref.length && !eco && !pop) {
+    ayResponde("Dime qué te gustaría y te muestro opciones de la carta.", [ayChips(AYUDA_PREF_CHIPS)]);
+    return;
+  }
+  var base = ayIndice().filter(function(e){ return e.cat !== "Arma tu roll" && e.cat !== "Entradas y salsas"; });
+  /* las promos combinan varios rolls con nombres abreviados: no las uso en filtros por ingredientes */
+  if (pref.some(function(p){ return p.solo; })) base = base.filter(function(e){ return e.cat !== "Promociones VIVA"; });
+  pref.forEach(function(p){ base = base.filter(p.f); if (p.nota) notas.push(p.nota); });
+  if (pop) base = base.filter(function(e){ return e.it.tag === "Popular" || e.it.tag === "Recomendado"; });
+  if (!base.length) {
+    ayResponde("No encontré productos que cumplan eso según la carta. No tengo ese dato: pregúntale al local.", [ayActs(ayWaBtn("Hola, quisiera una recomendación: " + t.slice(0, 120))), ayChips(AYUDA_PREF_CHIPS)]);
+    return;
+  }
+  var ordenada = base.slice().sort(function(a, b){ return eco ? a.it.p - b.it.p : ayRango(a) - ayRango(b); });
+  var elegidos = eco ? ordenada.slice(0, 3) : ayElige(ordenada, 3);
+  var nombre = pref.map(function(p){ return p.nombre; }).concat(eco ? ["económico"] : [], pop ? ["popular"] : []).join(", ");
+  var ex = elegidos.map(function(e){ return ayCard(e); });
+  notas.forEach(function(n){ ex.push(ayEl("p", "ay-nota", n)); });
+  ex.push(ayChips(["Recomiéndame algo"]));
+  ayResponde("Según la carta, esto va con lo que pides (" + nombre + ")" + (base.length > 3 ? " (" + base.length + " en total; te muestro 3)" : "") + ":", ex);
+}
+
+/* ---------- promos para N personas ---------- */
+var AYUDA_NUM = { un: 1, una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9, diez: 10 };
+function ayPersonas(t){
+  var m = /(\d+)\s*(personas|persona|pers|amigos|gente|comensales)/.exec(t) || /\b(?:para|somos|grupo de|familia de)\s+(\d+)\b/.exec(t);
+  if (m) return parseInt(m[1], 10);
+  m = /\b(?:para|somos|grupo de)\s+(un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\b/.exec(t);
+  return m ? AYUDA_NUM[m[1]] : 0;
+}
+function ayPromos(t){
+  var n = ayPersonas(t);
+  var promos = ayIndice().filter(function(e){ return e.cat === "Promociones VIVA"; }).map(function(e){
+    var m = /(\d+)\s*piezas/.exec(e.nombre); e.pzs = m ? parseInt(m[1], 10) : 0; return e;
+  }).filter(function(e){ return e.pzs; });
+  if (!n || n > 60) {
+    ayResponde(n > 60 ? "Para un grupo tan grande conviene hablar directo con el local." : "¿Para cuántas personas? Te oriento con las promos VIVA (es solo una guía).",
+      [n > 60 ? ayActs(ayWaBtn("Hola, quisiera cotizar un pedido para " + n + " personas.")) : ayChips(["Para 2 personas", "Para 3 personas", "Para 4 personas", "Para 6 personas", "Para 8 personas"])]);
+    return;
+  }
+  var meta = n * AYUDA_PIEZAS_PERSONA;
+  var arriba = promos.filter(function(e){ return e.pzs >= meta; }).sort(function(a, b){ return a.pzs - b.pzs || a.it.p - b.it.p; });
+  var abajo = promos.filter(function(e){ return e.pzs < meta; }).sort(function(a, b){ return b.pzs - a.pzs || a.it.p - b.it.p; });
+  var sel = [];
+  if (!arriba.length) sel = abajo.slice(0, 1);
+  else { if (abajo[0]) sel.push(abajo[0]); sel = sel.concat(arriba.slice(0, abajo[0] ? 2 : 3)); }
+  var intro = "Como guía, calculo unas " + AYUDA_PIEZAS_PERSONA + " piezas por persona: para " + n + (n === 1 ? " persona" : " personas") + " serían unas " + meta + " piezas. Depende del apetito, así que es solo una referencia.";
+  if (!arriba.length) intro += " Para tanta gente la promo más grande es esta; puedes combinar dos o consultar al local.";
+  var ex = sel.map(function(e){ return ayCard(e, "≈ " + clp(Math.round(e.it.p / n / 10) * 10) + " por persona (" + e.pzs + " piezas)"); });
+  if (!arriba.length) ex.push(ayActs(ayWaBtn("Hola, quisiera cotizar un pedido para " + n + " personas.")));
+  ayResponde(intro, ex);
+}
+
+/* ---------- intenciones simples ---------- */
+function ayHorario(){
+  var e = estadoLocal();
+  var t = "Atendemos de martes a sábado, de " + dos(HORARIO.abre) + ":00 a " + dos(HORARIO.cierra) + ":00 (hora de Santiago).";
+  var ahora = e.abierto ? "Ahora estamos abiertos, hasta las " + e.hasta + "." : "Ahora estamos cerrados; abrimos " + e.prox + ". Puedes armar y enviar tu pedido igual: te responden cuando abran.";
+  ayResponde([t, ahora, "No tengo información sobre feriados u horarios especiales: consúltalo con el local."], [ayActs(ayWaBtn("Hola, quería consultar por el horario."))]);
+}
+function ayUbicacion(){
+  ayResponde("Estamos en Santa Rosa #8689, San Ramón.", [ayActs(ayLink("Cómo llegar", ayMapsUrl(), "btn-ghost"))]);
+}
+function ayPago(){
+  ayResponde("Los medios de pago son efectivo y débito/crédito; lo eliges al enviar tu pedido. No tengo confirmado ningún otro medio: si quieres consultar algo distinto, pregúntale al local.", [ayActs(ayWaBtn("Hola, quería consultar por los medios de pago."))]);
+}
+function ayModalidad(){
+  /* usa el texto real de la ficha de la pagina; no afirma nada sobre despacho mas alla de eso */
+  var f = [].filter.call(document.querySelectorAll(".ficha > div"), function(x){ return /modalidades/i.test(x.textContent); })[0];
+  var pag = f && f.querySelector("small") ? f.querySelector("small").textContent.trim() : "Atención en el local. No contamos con delivery.";
+  ayResponde("Modalidades: para servir o para llevar. " + pag, [ayActs(ayLink("Cómo llegar", ayMapsUrl(), "btn-ghost"))]);
+}
+function ayTotal(){
+  var r = totals();
+  if (!r.n) { ayResponde("Aún no llevas nada en tu pedido.", [ayChips(["Recomiéndame algo", "Promos para grupo"])]); return; }
+  ayResponde("Llevas " + r.n + (r.n === 1 ? " producto" : " productos") + " por " + clp(r.t) + ".", [ayActs(ayBtn("Ver mi pedido", "btn-rojo", ayVerPedido))]);
+}
+function ayArmar(){
+  ayResponde(["Para armar tu pedido: 1) agrega productos con «Agregar» en la carta o aquí en el chat, 2) toca «Ver mi pedido», 3) completa tus datos, elige cómo pagar y envíalo: se abre WhatsApp con el pedido ya escrito.", "Si quieres ideas, puedo recomendarte o buscar por nombre o ingrediente."],
+    [ayActs(ayBtn("Ver mi pedido", "btn-rojo", ayVerPedido), ayBtn("Ir a la carta", "btn-ghost", function(){ ayCerrar(true); var m = document.getElementById("menu"); if (m) m.scrollIntoView({ behavior: "smooth" }); })), ayChips(["Recomiéndame algo", "Promos para grupo"])]);
+}
+function ayLocal(){
+  ayResponde("Te derivo al WhatsApp del local: ahí te responden personalmente.", [ayActs(ayWaBtn())]);
+}
+function ayDerivar(crudo){
+  ayResponde("Eso lo debe confirmar el local: no puedo responder por mi cuenta sobre alergias, salud, reclamos, tiempos o pedidos especiales. Escríbeles por WhatsApp y te contestan.",
+    [ayActs(ayWaBtn("Hola, tengo una consulta desde la página de pedidos: " + crudo.slice(0, 200)))]);
+}
+function ayNoEntendi(){
+  ayResponde("No entendí bien. Puedes probar con alguna de estas opciones, escribir el nombre de un producto (ej. «qué lleva el E2») o hablar con el local.",
+    [ayChips(AYUDA_CHIPS), ayActs(ayWaBtn())]);
+}
+
+/* ============================================================
+   AYUDA_INTENTS: lista en orden de prioridad. Cada una tiene
+   un patron (sobre el texto sin tildes y en minusculas) y una
+   funcion. Para agregar una respuesta nueva, agrega una linea
+   aqui y su funcion arriba.
+   ============================================================ */
+var AYUDA_INTENTS = [
+  { re: /alerg|gluten|celiac|lactosa|intoleran|diabet|embaraz|enferm|salud|intoxic|reclam|queja|mal estado|devoluc|reembols|cobraron|cobro|pedido especial|evento|cumplean|catering|factura|reserv|cotiz|sin sal\b|donde esta mi pedido|mi pedido (no )?llego|demor|tiempo de (espera|entrega)|cuanto tard/, fn: function(t, c){ ayDerivar(c); } },
+  { re: /cuanto llevo|mi total|total del pedido|cuanto debo|cuanto va\b|cuanto es el total|cuanto sale mi pedido/, fn: ayTotal },
+  { re: /\b(ver|abrir|mostrar|revisar|ir a)\b.*\b(pedido|carrito|bolsa)\b|^(mi )?(pedido|carrito)$/, fn: ayVerPedido },
+  { re: /whats|wasap|wsp|hablar con|contactar|contacto|telefono|llamar|numero|humano|persona real|atencion al cliente|con el local|con alguien/, fn: ayLocal },
+  { re: /delivery|despacho|domicilio|\benvi(o|os|an)\b|reparto|reparten|a mi casa|rappi|pedidosya|uber|para llevar|para servir|retiro|retirar|modalidad/, fn: ayModalidad },
+  { re: /pago|pagar|efectivo|debito|credito|tarjeta|transfer|mercado pago|webpay|redcompra|cuotas/, fn: ayPago },
+  { re: /abiert|abren|abrir|cierr|cerrad|horario|atiend|a que hora|hasta que hora|funcion/, fn: ayHorario },
+  { re: /donde|direccion|ubicacion|ubicad|llegar|mapa|comuna|como llego|\bqueda/, fn: ayUbicacion },
+  { re: /armar|hacer (mi |un )?pedido|como (pido|pedir|hago)|quiero pedir|realizar (un )?pedido|\bpedir\b/, fn: ayArmar }
+];
+var AYUDA_RE_RECOMIENDA = /recomien|sugier|sugerenc|que pido|que pedir|que hay de bueno|popular|mas vendido|favorito|barato|economic|vegetarian|vegan|sin pescado|sin crudo|no (me gusta|como|quiero) (el )?(pescado|crudo)|picante|apanad|algo (rico|distinto|con|sin)|con camaron|con palta|con queso crema/;
+function ayProcesar(crudo){
+  var t = ayLimpia(crudo);
+  if (!t) return;
+  for (var i = 0; i < AYUDA_INTENTS.length; i++) if (AYUDA_INTENTS[i].re.test(t)) { AYUDA_INTENTS[i].fn(t, crudo); return; }
+  if (/\bviva\s*\d+/.test(t) && ayResponderBusqueda(t)) return;
+  if (/promo|grupo|personas|somos|familia|combo|compartir|\bpara \d+|\d+ (personas|pers)/.test(t)) { ayPromos(t); return; }
+  if (AYUDA_RE_RECOMIENDA.test(t) && !/^(tienen|hay|que lleva)/.test(t)) { ayRecomendar(t); return; }
+  if (/^(hola|buenas|buenos dias|buen dia|buenas tardes|buenas noches|hey|holi)\b/.test(t) && t.split(" ").length <= 3) { ayResponde("Hola. ¿En qué te puedo ayudar?", [ayChips(AYUDA_CHIPS)]); return; }
+  if (/^(gracias|muchas gracias|chao|adios|ok|listo|vale|perfecto)\b/.test(t)) { ayResponde("Con gusto. Si necesitas algo más, aquí estoy."); return; }
+  var r = ayBuscar(t);
+  if (r && r.lista.length) { ayResponderBusqueda(t); return; }
+  if (r && /(que lleva|llevan|cuanto cuesta|cuanto vale|precio|tienen|tiene|tienes|hay|venden|ingredientes)/.test(t)) {
+    ayResponde("No encontré ese producto en la carta. Puede que se llame distinto o que no lo tengamos: pregúntale al local.", [ayActs(ayWaBtn("Hola, quería consultar por: " + crudo.slice(0, 150)))]);
+    return;
+  }
+  ayNoEntendi();
+}
+function ayEnviar(txt){
+  txt = String(txt).trim().slice(0, 300);
+  if (!txt) return;
+  var u = ayMsg("user"); u.textContent = txt;
+  try { ayProcesar(txt); } catch (e) { ayResponde("Tuve un problema para responder. Puedes escribirle al local.", [ayActs(ayWaBtn())]); }
+}
+
+/* ---------- panel: abrir, cerrar, teclado ---------- */
+function ayConstruir(){
+  var p = ayuda.panel;
+  var head = ayEl("div", "ay-head");
+  var h = ayEl("h2", "", "Asistente Viva Sushi"); h.id = "ayTitulo";
+  var x = ayEl("button", "ay-x", "×"); x.type = "button"; x.setAttribute("aria-label", "Cerrar asistente");
+  x.onclick = function(){ ayCerrar(true); };
+  head.append(h, x);
+  var log = ayEl("div", "ay-log"); log.setAttribute("role", "log"); log.setAttribute("aria-live", "polite"); log.setAttribute("aria-label", "Conversación con el asistente");
+  ayuda.log = log;
+  var chips = ayChips(AYUDA_CHIPS); chips.setAttribute("aria-label", "Respuestas rápidas"); chips.setAttribute("role", "group");
+  var form = ayEl("form", "ay-form");
+  var inp = ayEl("input"); inp.type = "text"; inp.maxLength = 300; inp.setAttribute("aria-label", "Escribe tu pregunta"); inp.placeholder = "Escribe tu pregunta…"; inp.autocomplete = "off"; inp.setAttribute("enterkeyhint", "send");
+  var env = ayEl("button", "btn btn-rojo", "Enviar"); env.type = "submit";
+  form.append(inp, env);
+  form.onsubmit = function(e){ e.preventDefault(); var v = inp.value; inp.value = ""; ayEnviar(v); inp.focus(); };
+  ayuda.input = inp;
+  p.append(head, log, chips, form);
+  ayResponde(AYUDA_SALUDO);
+  ayuda.listo = true;
+}
+function ayAbrir(){
+  if (!ayuda.listo) ayConstruir();
+  ayuda.panel.hidden = false;
+  ayuda.btn.hidden = true;
+  ayuda.btn.setAttribute("aria-expanded", "true");
+  ayuda.input.focus({ preventScroll: true });
+}
+function ayCerrar(devolverFoco){
+  if (ayuda.panel.hidden) return;
+  ayuda.panel.hidden = true;
+  ayuda.btn.hidden = false;
+  ayuda.btn.setAttribute("aria-expanded", "false");
+  if (devolverFoco) ayuda.btn.focus({ preventScroll: true });
+}
+(function(){
+  var b = ayEl("button", "ay-btn"); b.type = "button"; b.id = "ayBtn";
+  b.setAttribute("aria-haspopup", "dialog"); b.setAttribute("aria-expanded", "false"); b.setAttribute("aria-controls", "ayPanel");
+  b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5z"/></svg><span>Ayuda</span>';
+  b.onclick = ayAbrir;
+  var p = ayEl("section", "ay-panel"); p.id = "ayPanel"; p.hidden = true;
+  p.setAttribute("role", "dialog"); p.setAttribute("aria-modal", "false"); p.setAttribute("aria-labelledby", "ayTitulo");
+  modal.parentNode.insertBefore(p, modal.nextSibling);
+  modal.parentNode.insertBefore(b, modal.nextSibling);
+  ayuda.btn = b; ayuda.panel = p;
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && !p.hidden && !modal.classList.contains("show")) { e.preventDefault(); ayCerrar(true); }
+  });
+})();
 </script>
 </body>
 </html>

@@ -66,6 +66,20 @@ Aviso al pedir con el local cerrado · recordatorio de salsas y palitos · busca
 
 Si la página se publica en otro dominio, cambiar las URL absolutas `https://delaguardaagustin.github.io/viva-sushi/` (canonical, Open Graph, JSON-LD) en el `<head>`.
 
+## Asistente de ayuda (chat)
+
+Botón flotante **Ayuda** (abajo a la derecha, sube sobre la barra «Pedir» cuando hay pedido y se oculta con el modal del pedido abierto). Es un asistente **por reglas + búsqueda sobre `CARTA`**, no una IA: funciona 100% en el navegador, sin servidor, sin claves, sin costo, no envía datos a terceros, no guarda ni registra la conversación (vive solo en la memoria de la página; se pierde al recargar). El panel se construye al abrirlo por primera vez.
+
+Qué responde: horario y si está abierto ahora (reusa `estadoLocal()`), dirección y «Cómo llegar», medios de pago (solo efectivo y débito/crédito), modalidades/delivery (cita el texto real de la ficha de la página), «qué lleva / cuánto cuesta / tienen X» (búsqueda aproximada con sinónimos, hasta 3 resultados con botón «Agregar al pedido» que usa `addItem`), recomendaciones por preferencia (vegetariano, sin pescado, camarón, apanado/frito, palta, queso crema, económico, popular…), promos VIVA para N personas (guía de ~10 piezas por persona, `AYUDA_PIEZAS_PERSONA`), «ver mi pedido», «cuánto llevo» y «hablar con el local» (abre `wa.me`). Alergias, salud, reclamos, tiempos y pedidos especiales se derivan al WhatsApp sin responder por cuenta propia.
+
+**Límites:** no entiende frases complejas ni faltas de ortografía grandes; la carta no dice qué va crudo o cocido, ni alérgenos, así que «sin pescado» y «vegetariano» son heurísticas sobre las descripciones (el propio chat lo avisa y remite al local).
+
+**Cómo agregar o cambiar respuestas** (bloque de script al final de `index.html`, comentado «ASISTENTE DE AYUDA»):
+- Nueva intención: escribe una función `ayAlgo()` que use `ayResponde(texto, [nodos])` y agrega una línea a `AYUDA_INTENTS` con un patrón (`re`, sobre texto sin tildes y en minúsculas) y la función. El orden es la prioridad.
+- Chips rápidos: `AYUDA_CHIPS`. Saludo (primera línea fija): `AYUDA_SALUDO`.
+- Sinónimos de búsqueda: `AYUDA_SIN`. Palabras ignoradas: `AYUDA_STOP`. Preferencias de recomendación: `AYUDA_PREFS`.
+- Si cambian el horario, dirección o medios de pago, actualiza también `ayUbicacion()` y `ayPago()` (el horario sale de `HORARIO`).
+
 ## Categorías actuales
 
 Promociones VIVA · Rolls especiales · California Rolls · Hosomaki Rolls · Cheese Rolls ·
