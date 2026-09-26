@@ -72,6 +72,7 @@ html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{background:var(--sumi);color:var(--papel);font-family:var(--font);font-size:16.5px;line-height:1.6;padding-bottom:104px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}
 a{color:inherit}
+[hidden]{display:none !important}
 ::selection{background:var(--rojo);color:var(--papel)}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--rojo-vivo);outline-offset:3px}
 .wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 20px}
@@ -496,6 +497,15 @@ footer .sep{margin:0 8px;color:var(--linea2)}
 var WHATSAPP = "56997887871";
 
 /* ============================================================
+   1b) OPCIONES DEL LOCAL
+   PEDIR_DIRECCION: true muestra el campo "Dirección" en el pedido;
+   false lo quita del formulario y del mensaje (el local no tiene delivery).
+   HORARIO: dias 0=domingo ... 6=sábado; hora de Santiago.
+   ============================================================ */
+var PEDIR_DIRECCION = true;
+var HORARIO = { dias: [2, 3, 4, 5, 6], abre: 13, cierra: 22 };
+
+/* ============================================================
    2) FOTO DE CADA CATEGORIA (opcional).
    La clave debe coincidir con el nombre exacto de la categoria.
    Si no hay foto, se muestra el numero de la categoria.
@@ -719,8 +729,11 @@ function slug(s){
           .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 function dos(n){ return (n < 10 ? "0" : "") + n; }
+function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
 
 var cart = {};
+var CLAVE_CARRITO = "vivasushi-carrito-v1";
+var buscables = [];   // { el, sec } para el buscador
 var modo = "Para llevar";
 
 var tabsEl = document.getElementById("tabs");
@@ -747,7 +760,7 @@ CARTA.forEach(function(c, ci){
   emb.className = "cat-emblema";
   if (FOTOS[c.cat]) {
     var im = document.createElement("img");
-    im.src = FOTOS[c.cat]; im.alt = c.cat; im.loading = "lazy";
+    im.src = FOTOS[c.cat]; im.alt = c.cat; im.loading = "lazy"; im.width = 52; im.height = 52;
     emb.appendChild(im);
   } else {
     emb.textContent = dos(ci + 1);
@@ -768,6 +781,7 @@ CARTA.forEach(function(c, ci){
   var cuenta = document.createElement("span");
   cuenta.className = "cat-cuenta";
   cuenta.textContent = c.items.length + (c.items.length === 1 ? " producto" : " productos");
+  sec.__cuenta = cuenta;
 
   head.append(emb, txt, cuenta);
   sec.appendChild(head);
@@ -781,6 +795,7 @@ CARTA.forEach(function(c, ci){
 
     var el = document.createElement("div");
     el.className = "item";
+    buscables.push({ el: el, sec: sec, q: norm(c.cat + " " + it.n + " " + (it.d || "") + " " + (it.tag || "")) });
 
     var top = document.createElement("div");
     top.className = "item-top";
@@ -816,43 +831,116 @@ CARTA.forEach(function(c, ci){
   c.items.forEach(function(it, ii){ refreshControl(ci + "-" + ii, it); });
 });
 
+/* ---------- carrito guardado en el navegador (localStorage) ---------- */
+function guardarCarrito(){
+  try {
+    var arr = [];
+    for (var k in cart) arr.push({ n: cart[k].n, q: cart[k].q });
+    if (arr.length) localStorage.setItem(CLAVE_CARRITO, JSON.stringify({ t: Date.now(), items: arr }));
+    else localStorage.removeItem(CLAVE_CARRITO);
+  } catch(e) {}
+}
+function cargarCarrito(){
+  try {
+    var raw = localStorage.getItem(CLAVE_CARRITO);
+    if (!raw) return;
+    var o = JSON.parse(raw);
+    if (!o || !o.items || !o.t || Date.now() - o.t > 24 * 3600 * 1000) { localStorage.removeItem(CLAVE_CARRITO); return; }
+    var mapa = {};   // por nombre: si la carta cambia de orden o de precio, el pedido guardado sigue valiendo
+    CARTA.forEach(function(c, ci){ c.items.forEach(function(it, ii){ mapa[it.n] = { key: ci + "-" + ii, it: it }; }); });
+    o.items.forEach(function(x){
+      var f = mapa[x && x.n], q = Math.floor(+(x && x.q));
+      if (f && q > 0) cart[f.key] = { n: f.it.n, p: f.it.p, q: Math.min(q, 99), ref: f.it };
+    });
+    Object.keys(cart).forEach(function(k){ refreshControl(k, cart[k].ref); });
+  } catch(e) {}
+}
+
 function refreshControl(key, it){
   var foot = document.querySelector('.item-foot[data-key="' + key + '"]');
   if (!foot) return;
+  var teniaFoco = foot.contains(document.activeElement);
+  var quiso = teniaFoco && document.activeElement.dataset ? document.activeElement.dataset.a : "";
   var old = foot.querySelector(".add, .qty");
   if (old) old.remove();
+  var foco = null;
 
   if (!cart[key]) {
     var b = document.createElement("button");
+    b.type = "button";
     b.className = "add";
     b.textContent = "Agregar";
+    b.setAttribute("aria-label", "Agregar " + it.n + " al pedido");
     b.onclick = function(){ addItem(key, it); refreshControl(key, it); };
     foot.appendChild(b);
-    return;
+    foco = b;
+  } else {
+    var q = document.createElement("div");
+    q.className = "qty";
+    var minus = document.createElement("button"); minus.type = "button"; minus.textContent = "−"; minus.dataset.a = "m";
+    var num   = document.createElement("span");   num.textContent = cart[key].q;
+    var plus  = document.createElement("button"); plus.type = "button"; plus.textContent = "+"; plus.dataset.a = "p";
+    minus.setAttribute("aria-label", "Quitar uno: " + it.n);
+    plus.setAttribute("aria-label", "Agregar uno más: " + it.n);
+    minus.onclick = function(){ changeQty(key, -1); refreshControl(key, it); renderLines(); };
+    plus.onclick  = function(){ changeQty(key,  1); refreshControl(key, it); renderLines(); };
+    q.append(minus, num, plus);
+    foot.appendChild(q);
+    foco = quiso === "m" ? minus : plus;
   }
-
-  var q = document.createElement("div");
-  q.className = "qty";
-  var minus = document.createElement("button"); minus.textContent = "−";
-  var num   = document.createElement("span");   num.textContent = cart[key].q;
-  var plus  = document.createElement("button"); plus.textContent = "+";
-  minus.onclick = function(){ changeQty(key, -1); refreshControl(key, it); renderLines(); };
-  plus.onclick  = function(){ changeQty(key,  1); refreshControl(key, it); renderLines(); };
-  q.append(minus, num, plus);
-  foot.appendChild(q);
+  if (teniaFoco && foco) foco.focus({ preventScroll: true });
 }
 
 function addItem(key, it){
   if (!cart[key]) cart[key] = { n: it.n, p: it.p, q: 0, ref: it };
-  cart[key].q++;
+  if (cart[key].q < 99) cart[key].q++;
   updateBar();
 }
 function changeQty(key, d){
   if (!cart[key]) return;
-  cart[key].q += d;
+  cart[key].q = Math.min(99, cart[key].q + d);
   if (cart[key].q <= 0) delete cart[key];
   updateBar();
 }
+
+/* ---------- buscador de la carta ---------- */
+var buscarEl = document.getElementById("buscar");
+var buscarX  = document.getElementById("buscarX");
+function filtrar(){
+  var texto = norm(buscarEl.value.trim());
+  var toks = texto ? texto.split(/\s+/) : [];
+  var porSec = [], n = 0, total = buscables.length;
+  buscables.forEach(function(b){
+    var ok = true;
+    for (var i = 0; i < toks.length; i++) if (b.q.indexOf(toks[i]) < 0) { ok = false; break; }
+    b.el.hidden = !ok;
+    if (ok) { n++; b.sec.__n = (b.sec.__n || 0) + 1; }
+    if (porSec.indexOf(b.sec) < 0) porSec.push(b.sec);
+  });
+  porSec.forEach(function(sec){
+    var m = sec.__n || 0;
+    sec.hidden = toks.length > 0 && m === 0;
+    var tot = sec.querySelectorAll(".item").length;
+    sec.__cuenta.textContent = toks.length ? m + " de " + tot : tot + (tot === 1 ? " producto" : " productos");
+    sec.__n = 0;
+  });
+  tabsEl.classList.toggle("oculto", toks.length > 0);
+  buscarX.hidden = !buscarEl.value;
+  var info = document.getElementById("busqInfo");
+  var vacio = document.getElementById("sinRes");
+  if (!toks.length) { info.textContent = ""; }
+  else if (n === 0) { info.textContent = "Sin resultados."; }
+  else { info.textContent = n + (n === 1 ? " producto encontrado" : " productos encontrados"); }
+  if (toks.length && n === 0) {
+    if (!vacio) {
+      vacio = document.createElement("p"); vacio.id = "sinRes"; vacio.className = "sin-res";
+      menuEl.appendChild(vacio);
+    }
+    vacio.textContent = "No encontramos “" + buscarEl.value.trim() + "”. Prueba con otra palabra (salmón, pollo, palta…) o borra la búsqueda.";
+  } else if (vacio) { vacio.remove(); }
+}
+buscarEl.addEventListener("input", filtrar);
+buscarX.addEventListener("click", function(){ buscarEl.value = ""; filtrar(); buscarEl.focus(); });
 
 tabsEl.addEventListener("click", function(e){
   var t = e.target.closest(".tab");
@@ -898,20 +986,95 @@ function updateBar(){
   document.getElementById("barCount").textContent = r.n;
   document.getElementById("barTotal").textContent = clp(r.t);
   document.getElementById("mTotal").textContent = clp(r.t);
-  bar.classList.toggle("show", r.n > 0);
+  if (!modal.classList.contains("show")) bar.classList.toggle("show", r.n > 0);
+  guardarCarrito();
+}
+
+/* ---------- estado del local (hora de Santiago) ---------- */
+var DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+function ahoraSantiago(){
+  try {
+    var p = new Intl.DateTimeFormat("en-US", { weekday: "short", hour: "numeric", minute: "numeric", hourCycle: "h23", timeZone: "America/Santiago" }).formatToParts(new Date());
+    var g = function(t){ for (var i = 0; i < p.length; i++) if (p[i].type === t) return p[i].value; };
+    var dia = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(g("weekday"));
+    var h = parseInt(g("hour"), 10) % 24, m = parseInt(g("minute"), 10);
+    if (dia > -1 && !isNaN(h) && !isNaN(m)) return { dia: dia, min: h * 60 + m };
+  } catch(e) {}
+  var d = new Date();   // sin Intl: usa la hora del aparato
+  return { dia: d.getDay(), min: d.getHours() * 60 + d.getMinutes() };
+}
+function estadoLocal(){
+  var a = ahoraSantiago(), A = HORARIO.abre * 60, C = HORARIO.cierra * 60;
+  var hoyAbre = HORARIO.dias.indexOf(a.dia) > -1;
+  var hAbre = dos(HORARIO.abre) + ":00", hCierra = dos(HORARIO.cierra) + ":00";
+  if (hoyAbre && a.min >= A && a.min < C) return { abierto: true, hasta: hCierra, prox: "" };
+  var prox = "";
+  if (hoyAbre && a.min < A) prox = "hoy a las " + hAbre;
+  else {
+    for (var i = 1; i <= 7; i++) {
+      var d = (a.dia + i) % 7;
+      if (HORARIO.dias.indexOf(d) > -1) { prox = (i === 1 ? "mañana" : "el " + DIAS[d]) + " a las " + hAbre; break; }
+    }
+  }
+  return { abierto: false, hasta: hCierra, prox: prox };
+}
+function pintarEstado(){
+  var e = estadoLocal();
+  var el = document.getElementById("abierto"), s = el.querySelector("span");
+  if (e.abierto) { el.className = "abierto si"; s.innerHTML = "<b>Abierto ahora</b> · hasta las " + e.hasta; }
+  else { el.className = "abierto no"; s.innerHTML = "<b>Cerrado ahora</b> · abrimos " + e.prox; }
+  var msg = e.abierto ? "" : "El local está cerrado ahora y abre " + e.prox + ". Puedes enviar tu pedido igual: te responderán cuando abra.";
+  ["avisoCerrado", "avisoCerrado2"].forEach(function(id){
+    var a = document.getElementById(id);
+    a.textContent = msg;
+    a.classList.toggle("show", !e.abierto);
+  });
+  return e;
 }
 
 var modal   = document.getElementById("modal");
 var linesEl = document.getElementById("lines");
+var sheetEl = modal.querySelector(".sheet");
+var ultimoFoco = null;
+
+/* salsas "a elección" que incluyen las promos del pedido */
+function salsasIncluidas(){
+  var n = 0;
+  for (var k in cart) {
+    var m = /(\d+)\s+salsas?\s+a\s+elecci/i.exec(cart[k].ref.d || "");
+    if (m) n += (+m[1]) * cart[k].q;
+  }
+  return n;
+}
+function pintarPistas(){
+  var inc = salsasIncluidas();
+  var elegidas = (+document.getElementById("salsaSoya").value) + (+document.getElementById("salsaTeriyaki").value);
+  var ps = document.getElementById("pistaSalsas");
+  var faltan = inc - elegidas;
+  if (inc > 0 && faltan > 0) {
+    ps.innerHTML = "Tu pedido incluye <b>" + inc + (inc === 1 ? " salsa" : " salsas") + " a elección</b> (soya o teriyaki). Elígelas arriba para que sepamos cuáles poner; te " + (faltan === 1 ? "falta 1" : "faltan " + faltan) + ".";
+    ps.classList.add("show");
+  } else { ps.classList.remove("show"); ps.textContent = ""; }
+  var pp = document.getElementById("pistaPalitos");
+  if (document.getElementById("palitos").value === "0") {
+    pp.innerHTML = "¿Necesitas palitos? Indica cuántos <b>pares</b> quieres.";
+    pp.classList.add("show");
+  } else { pp.classList.remove("show"); pp.textContent = ""; }
+}
 
 function renderLines(){
+  var foco = null;
+  if (linesEl.contains(document.activeElement) && document.activeElement.dataset.k) foco = { k: document.activeElement.dataset.k, a: document.activeElement.dataset.a };
   linesEl.innerHTML = "";
   var keys = Object.keys(cart);
+  document.getElementById("vaciar").hidden = !keys.length;
+  pintarPistas();
   if (!keys.length) {
     var e = document.createElement("p");
     e.className = "empty";
     e.textContent = "Tu pedido está vacío.";
     linesEl.appendChild(e);
+    if (foco) sheetEl.focus({ preventScroll: true });
     return;
   }
   keys.forEach(function(k){
@@ -928,9 +1091,11 @@ function renderLines(){
 
     var q = document.createElement("div");
     q.className = "qty";
-    var m  = document.createElement("button"); m.textContent = "−";
+    var m  = document.createElement("button"); m.type = "button"; m.textContent = "−"; m.dataset.k = k; m.dataset.a = "m";
     var nn = document.createElement("span");   nn.textContent = it.q;
-    var p  = document.createElement("button"); p.textContent = "+";
+    var p  = document.createElement("button"); p.type = "button"; p.textContent = "+"; p.dataset.k = k; p.dataset.a = "p";
+    m.setAttribute("aria-label", "Quitar uno: " + it.n);
+    p.setAttribute("aria-label", "Agregar uno más: " + it.n);
     m.onclick = function(){ changeQty(k, -1); refreshControl(k, it.ref); renderLines(); };
     p.onclick = function(){ changeQty(k,  1); refreshControl(k, it.ref); renderLines(); };
     q.append(m, nn, p);
@@ -942,10 +1107,26 @@ function renderLines(){
     row.append(ln, q, lp);
     linesEl.appendChild(row);
   });
+  if (foco) {
+    var nb = linesEl.querySelector('button[data-k="' + foco.k + '"][data-a="' + foco.a + '"]') || linesEl.querySelector("button[data-k]");
+    (nb || sheetEl).focus({ preventScroll: true });
+  }
+}
+
+/* lo de atrás queda inerte mientras el pedido está abierto (teclado y lector de pantalla) */
+function fondoInerte(si){
+  ["a.skip", "header", "main", "footer", "#bar"].forEach(function(sel){
+    var e = document.querySelector(sel);
+    if (!e) return;
+    if (si) { e.setAttribute("inert", ""); e.setAttribute("aria-hidden", "true"); }
+    else { e.removeAttribute("inert"); e.removeAttribute("aria-hidden"); }
+  });
 }
 
 function openModal(){
+  ultimoFoco = document.activeElement;
   renderLines();
+  pintarEstado();
   // volver al estado inicial del formulario (por si ya se habia enviado antes)
   document.getElementById("sendWrap").style.display = "";
   document.getElementById("done").classList.remove("show");
@@ -953,8 +1134,10 @@ function openModal(){
   modal.classList.add("show");
   document.body.style.overflow = "hidden";
   bar.classList.remove("show"); // ocultar la barra inferior mientras el modal está abierto
-  var sheet = modal.querySelector(".sheet");
+  fondoInerte(true);
+  var sheet = sheetEl;
   sheet.scrollTop = 0;
+  sheet.focus({ preventScroll: true });
   // Red de seguridad: si la animación de entrada no avanza (móviles con
   // "reducir movimiento", ahorro de batería, pestaña en 2º plano...), cortarla
   // y forzar la posición final para que la hoja no quede fuera de la pantalla.
@@ -964,13 +1147,56 @@ function openModal(){
     sheet.style.opacity = "1";
   }, 360);
 }
-function closeModal(){ modal.classList.remove("show"); document.body.style.overflow = ""; updateBar(); }
+function closeModal(){
+  if (!modal.classList.contains("show")) return;
+  modal.classList.remove("show");
+  document.body.style.overflow = "";
+  fondoInerte(false);
+  updateBar();
+  if (ultimoFoco && document.body.contains(ultimoFoco) && ultimoFoco.focus) ultimoFoco.focus({ preventScroll: true });
+  ultimoFoco = null;
+}
 
 document.getElementById("barOpen").onclick = openModal;
 document.getElementById("barGo").onclick   = openModal;
 document.getElementById("close").onclick   = closeModal;
 modal.addEventListener("click", function(e){ if (e.target === modal) closeModal(); });
-document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeModal(); });
+document.addEventListener("keydown", function(e){
+  if (!modal.classList.contains("show")) return;
+  if (e.key === "Escape") { closeModal(); return; }
+  if (e.key !== "Tab") return;
+  // mantener el foco dentro del pedido
+  var f = [].filter.call(sheetEl.querySelectorAll("button, input, select, textarea, a[href]"), function(x){
+    return !x.disabled && x.offsetParent !== null;
+  });
+  if (!f.length) { e.preventDefault(); sheetEl.focus(); return; }
+  var a = document.activeElement, primero = f[0], ultimo = f[f.length - 1];
+  if (e.shiftKey && (a === primero || a === sheetEl || !sheetEl.contains(a))) { e.preventDefault(); ultimo.focus(); }
+  else if (!e.shiftKey && (a === ultimo || !sheetEl.contains(a))) { e.preventDefault(); primero.focus(); }
+});
+
+var vaciarBtn = document.getElementById("vaciar"), vaciarT = null;
+function vaciarCarrito(){
+  cart = {};
+  document.querySelectorAll(".item-foot").forEach(function(f){
+    var key = f.dataset.key, par = key.split("-");
+    refreshControl(key, CARTA[+par[0]].items[+par[1]]);
+  });
+  updateBar();
+}
+vaciarBtn.onclick = function(){
+  if (vaciarBtn.dataset.seguro !== "1") {
+    vaciarBtn.dataset.seguro = "1";
+    vaciarBtn.textContent = "¿Seguro? Toca de nuevo para vaciar";
+    vaciarT = setTimeout(function(){ vaciarBtn.dataset.seguro = ""; vaciarBtn.textContent = "Vaciar pedido"; }, 4000);
+    return;
+  }
+  clearTimeout(vaciarT);
+  vaciarBtn.dataset.seguro = ""; vaciarBtn.textContent = "Vaciar pedido";
+  vaciarCarrito();
+  closeModal();
+};
+document.getElementById("nuevo").onclick = function(){ vaciarCarrito(); closeModal(); };
 
 document.getElementById("modo").addEventListener("click", function(e){
   var b = e.target.closest("button");
@@ -988,14 +1214,20 @@ document.getElementById("modo").addEventListener("click", function(e){
     o.value = i; o.textContent = i;
     sel.appendChild(o);
   }
+  sel.addEventListener("change", pintarPistas);
 });
 
-/* teléfono: solo dígitos, 8 como máximo (el +56 9 es fijo) */
+/* teléfono: solo dígitos, 8 como máximo (el +56 9 es fijo).
+   Acepta que peguen el número completo: +56 9 1234 5678, 56912345678, 912345678 */
+function limpiaTel(v){
+  var d = v.replace(/\D/g, "");
+  if (d.length > 8) d = d.replace(/^56/, "");   // pegó el código de país
+  if (d.length > 8) d = d.replace(/^9/, "");    // pegó también el 9 del móvil
+  return d.slice(0, 8);
+}
 document.getElementById("telNum").addEventListener("input", function(){
-  var d = this.value.replace(/\D/g, "");
-  if (d.length > 8) { d = d.replace(/^56/, ""); }   // pegó el código de país
-  if (d.length > 8) { d = d.replace(/^9/, ""); }    // pegó también el 9 del móvil
-  this.value = d.slice(0, 8);
+  var v = limpiaTel(this.value);
+  if (this.value !== v) this.value = v;
 });
 
 /* medio de pago (botones) */
@@ -1035,7 +1267,7 @@ document.getElementById("send").onclick = function(){
 
   var nombre     = document.getElementById("nombre").value.trim();
   var contacto   = document.getElementById("telNum").value.replace(/\D/g, "");
-  var direccion  = document.getElementById("direccion").value.trim();
+  var direccion  = PEDIR_DIRECCION ? document.getElementById("direccion").value.trim() : "";
   var soya       = +document.getElementById("salsaSoya").value;
   var teriyaki   = +document.getElementById("salsaTeriyaki").value;
   var palitos    = document.getElementById("palitos").value;
@@ -1064,7 +1296,7 @@ document.getElementById("send").onclick = function(){
   L.push("Nombre: " + nombre);
   L.push("Contacto: " + telFmt);
   L.push("Modalidad: " + modo);
-  if (direccion) L.push("Dirección: " + direccion);
+  if (PEDIR_DIRECCION && direccion) L.push("Dirección: " + direccion);
   L.push("Salsas: " + salsasTxt);
   L.push("Palitos: " + palitos + " par(es)");
   L.push("Medio de pago: " + pago);
@@ -1086,15 +1318,17 @@ document.getElementById("send").onclick = function(){
   err.classList.remove("show");
   document.getElementById("sendWrap").style.display = "none";
   var done = document.getElementById("done");
+  pintarEstado();
   done.classList.add("show");
   scrollSheetToBottom();
+  done.focus({ preventScroll: true });
 
   // Intento de apertura automática (gesto del usuario aún activo).
   waLink.click();
 };
 
 document.getElementById("copyBtn").onclick = function(){
-  var t = (window.__pedidoTxt || "") + "\n\nEnviar a: " + WHATSAPP;
+  var t = (window.__pedidoTxt || "") + "\n\nEnviar al WhatsApp +56 9 9788 7871";
   var btn = this;
   function ok(){ btn.textContent = "¡Copiado! ✅"; setTimeout(function(){ btn.textContent = "Copiar pedido"; }, 2500); }
   function legacy(){
@@ -1109,20 +1343,11 @@ document.getElementById("copyBtn").onclick = function(){
   } else { legacy(); }
 };
 
+cargarCarrito();
+if (!PEDIR_DIRECCION) document.getElementById("campoDireccion").hidden = true;
+pintarEstado();
+setInterval(pintarEstado, 60000);
 updateBar();
-</script>
-<script>
-/* estado del local según la hora de Santiago (martes a sábado, 13:00 a 22:00) */
-(function(){try{
-  var p=new Intl.DateTimeFormat('es-CL',{weekday:'long',hour:'numeric',minute:'numeric',hour12:false,timeZone:'America/Santiago'}).formatToParts(new Date());
-  var g=function(t){for(var i=0;i<p.length;i++){if(p[i].type===t)return p[i].value}};
-  var d=(g('weekday')||'').toLowerCase(), h=parseInt(g('hour'),10)%24, m=parseInt(g('minute'),10), mins=h*60+m;
-  var abre=['martes','miércoles','jueves','viernes','sábado'].indexOf(d)>-1;
-  var el=document.getElementById('abierto'), s=el.querySelector('span');
-  if(abre&&mins>=13*60&&mins<22*60){el.className='abierto si';s.innerHTML='<b>Abierto ahora</b> · hasta las 22:00';}
-  else if(abre&&mins<13*60){el.className='abierto no';s.innerHTML='<b>Cerrado ahora</b> · hoy abrimos a las 13:00';}
-  else{el.className='abierto no';s.innerHTML='<b>Cerrado ahora</b> · abrimos martes a sábado desde las 13:00';}
-}catch(e){}})();
 </script>
 </body>
 </html>
