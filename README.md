@@ -13,10 +13,13 @@ El cliente arma su pedido y lo envía por WhatsApp con el detalle ya escrito.
 
 ## Qué hace
 
-- Carta completa navegable por categorías (145 productos).
+- Carta completa navegable por categorías (153 productos en 15 categorías) y **buscador** (sin tildes ni mayúsculas).
 - Carrito con cantidades y total en vivo.
 - Elección de modalidad: **Para llevar** o **Para servir**.
-- Al enviar, abre WhatsApp con el pedido completo redactado: productos, cantidades, total, nombre y comentarios.
+- Al enviar, abre WhatsApp con el pedido completo redactado: productos, cantidades, total, nombre, teléfono, salsas, palitos, medio de pago y comentarios.
+- Muestra **Abierto/Cerrado** según la hora de Santiago. Con el local cerrado deja pedir igual, avisando cuándo abren.
+- Recuerda (sin obligar) elegir las salsas que incluyen las promos y los palitos.
+- El carrito se guarda en el navegador por 24 horas (si se recarga, no se pierde).
 - Enlaces a Instagram, Facebook y Google Maps.
 
 ## Cómo funciona
@@ -47,10 +50,26 @@ Busca `var CARTA = [` y edita ahí.
 
 Para cambiar el número de WhatsApp, edita la constante `WHATSAPP` (formato internacional, sin `+` ni espacios).
 
+## Opciones rápidas (arriba del script en `index.html`)
+
+| Constante | Para qué sirve |
+|-----------|----------------|
+| `WHATSAPP` | Número que recibe los pedidos |
+| `PEDIR_DIRECCION` | `true` muestra el campo "Dirección"; `false` lo quita del formulario y del mensaje (el local no tiene delivery) |
+| `HORARIO` | Días (0 = domingo … 6 = sábado) y horas de apertura/cierre. Cambiarlo también en la ficha y el pie de la página y en el bloque JSON-LD del `<head>` |
+
+Las promos que digan `N salsas a elección` en su descripción activan el recordatorio de salsas. Mantén esa frase al editarlas.
+
+## Qué se agregó en la revisión de septiembre 2026
+
+Aviso al pedir con el local cerrado · recordatorio de salsas y palitos · buscador · carrito guardado (`localStorage`) · diálogo del pedido accesible (foco atrapado, Escape, roles ARIA) · SEO (título, descripción, Open Graph, Twitter, favicon, JSON-LD de Restaurante con los datos reales de la página). Corrige: teléfono pegado con +56 9, categorías tapadas por la barra fija al tocar su pestaña, controles ocultos alcanzables con el teclado. Detalle en `INFORME-QA.md`.
+
+Si la página se publica en otro dominio, cambiar las URL absolutas `https://delaguardaagustin.github.io/viva-sushi/` (canonical, Open Graph, JSON-LD) en el `<head>`.
+
 ## Categorías actuales
 
 Promociones VIVA · Rolls especiales · California Rolls · Hosomaki Rolls · Cheese Rolls ·
-Avocado Rolls · Tempura Rolls · Sake Rolls · Futomaki · Rolls veganos · Temaki ·
+Avocado Rolls · Tempura Rolls · Sake Rolls · Futomaki · Rolls veganos · Temaki · Handroll ·
 Nigiri y Sashimi · Entradas y salsas · Arma tu roll
 
 ## Pendientes
