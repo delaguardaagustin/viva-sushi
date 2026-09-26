@@ -559,6 +559,13 @@ var MAX_SALSAS = 10;   /* tope por tipo de salsa (soya / teriyaki) en el selecto
 /* Salsas: cada promo VIVA incluye N a elección; cada salsa de más cuesta SALSA_EXTRA.
    COBRAR_SALSAS_SIN_PROMO: si es false, un pedido sin ninguna promo VIVA no cobra salsas (el local decide). */
 var SALSA_EXTRA = 500;
+/* Salsas incluidas por producto (según el dueño, 26-09-2026):
+   - cada promo VIVA trae las que dice su descripción ("N salsas a elección");
+   - cada roll de estas categorías trae 1 salsa por unidad, salvo los códigos de SIN_SALSA
+     (E2 y E4 ya vienen con su propia salsa). Temaki, handroll, nigiri, entradas y "Arma tu roll":
+     sin salsa incluida (por confirmar con el local). */
+var CATS_CON_SALSA = ["Rolls especiales", "California Rolls", "Hosomaki Rolls", "Cheese Rolls", "Avocado Rolls", "Tempura Rolls", "Sake Rolls", "Futomaki", "Rolls veganos"];
+var SIN_SALSA = ["E2", "E4"];
 var COBRAR_SALSAS_SIN_PROMO = false;
 var HORARIO = { dias: [2, 3, 4, 5, 6], abre: 13, cierra: 22 };
 
@@ -595,12 +602,12 @@ var CARTA = [
     {n:"VIVA 15 — 100 piezas", d:"50 fritas + 50 frías. 20 pzs Tempura Tory + Tempura Ebi + Tempura Choclo + Tempura Kani + California Vegeta + Cheese Tory + Avocado Tory + California Sake + Futomaki Cheese. 9 salsas a elección.", p:28000, tag:"La más grande"}
   ]},
 
-  { cat:"Rolls especiales", nota:"Nuestras creaciones de la casa.", items:[
+  { cat:"Rolls especiales", nota:"Nuestras creaciones de la casa. Cada roll incluye 1 salsa a elección (salvo E2 y E4, que ya vienen con su salsa).", items:[
     {n:"Viva Burger", d:"Pan de arroz apanado y frito, relleno de pollo, palta, queso crema, cebollín y alga nori. Se sirve caliente.", p:6500, tag:"Nuevo"},
     {n:"E1 · Roll cheese apanado", d:"Pollo, palta, cebollín. Envuelto en queso crema y frito.", p:4500},
     {n:"E2 · Roll acevichado", d:"Camarón tempura, queso crema, cebollín, envuelto en salmón. Bañado en salsa acevichada.", p:4900, tag:"Recomendado"},
     {n:"E3 · Cheese especial", d:"Camarón, palta, cebollín, envuelto en queso crema y espolvoreado con un leve toque de merquén ahumado.", p:4700},
-    {n:"E4 · Ceviche Roll", d:"Palta, queso crema, bañado en ceviche mixto de salmón, camarón, kanikama, cebolla morada, ciboulette y palta.", p:5000},
+    {n:"E4 · Ceviche Roll", d:"Palta, queso crema, bañado en ceviche mixto de salmón, camarón, kanikama, cebolla morada, ciboulette y palta.", p:5500},
     {n:"E5 · Beef Roll", d:"Carne, queso gauda, cebollín, envuelto en palta.", p:5200},
     {n:"E6 · Hot Beef (roll apanado)", d:"Carne, queso gauda, cebollín.", p:5000},
     {n:"E7 · Mechada Roll", d:"Carne mechada, queso crema, cebollín, envuelto en palta.", p:5200},
@@ -1104,12 +1111,17 @@ var sheetEl = modal.querySelector(".sheet");
 var ultimoFoco = null;
 
 /* salsas "a elección" que incluyen las promos del pedido */
+function salsasDeItem(k){
+  var it = cart[k].ref;
+  var m = /(\d+)\s+salsas?\s+a\s+elecci/i.exec(it.d || "");
+  if (m) return +m[1];
+  var cat = CARTA[+String(k).split("-")[0]];
+  if (cat && CATS_CON_SALSA.indexOf(cat.cat) > -1 && SIN_SALSA.indexOf(String(it.n).split(" ")[0]) === -1) return 1;
+  return 0;
+}
 function salsasIncluidas(){
   var n = 0;
-  for (var k in cart) {
-    var m = /(\d+)\s+salsas?\s+a\s+elecci/i.exec(cart[k].ref.d || "");
-    if (m) n += (+m[1]) * cart[k].q;
-  }
+  for (var k in cart) n += salsasDeItem(k) * cart[k].q;
   return n;
 }
 function llenarSel(id, max, val){

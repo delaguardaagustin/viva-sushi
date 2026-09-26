@@ -95,3 +95,9 @@ Nigiri y Sashimi · Entradas y salsas · Arma tu roll
 ## Salsas incluidas y salsas extra
 
 El pedido separa dos bloques: **Salsas incluidas** (aparece solo si hay una promo VIVA; el máximo es lo que suman las promos del pedido, tomado de la frase `N salsas a elección` de su descripción, y soya + teriyaki nunca pasan de ese número) y **Salsas extra** (`SALSA_EXTRA` = $500 cada una, se suman al total y al mensaje de WhatsApp). Sin ninguna promo VIVA no se cobran salsas mientras `COBRAR_SALSAS_SIN_PROMO = false`. `MAX_SALSAS` es el tope de extras por tipo. Las constantes están arriba en `index.html`.
+
+### Qué trae salsa incluida
+
+- Promos VIVA: las que diga su descripción (`N salsas a elección`).
+- Rolls (especiales, California, Hosomaki, Cheese, Avocado, Tempura, Sake, Futomaki y veganos): 1 salsa por unidad, **salvo E2 y E4** (ya vienen con su salsa). Se controla con `CATS_CON_SALSA` y `SIN_SALSA` en `index.html`.
+- Temaki, handroll, nigiri, entradas y "Arma tu roll": sin salsa incluida (por confirmar con el local).
