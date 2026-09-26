@@ -91,3 +91,7 @@ Nigiri y Sashimi · Entradas y salsas · Arma tu roll
 - [ ] Confirmar precios de **California Sake** (#5) y **California Tako** (#8) — la foto de la carta no permitía distinguir entre `$3.600` y `$3.800`.
 - [ ] Definir si existen los productos **E12** y **E17** (la carta salta de E11 a E13 y de E16 a E18).
 - [ ] Agregar sección de bebidas si corresponde.
+
+## Salsas extra
+
+Cada promo VIVA incluye N salsas a elección (soya o teriyaki; sale de la frase `N salsas a elección` en su descripción). Cada salsa de más se cobra `SALSA_EXTRA` ($500) y se suma al total del pedido y al mensaje de WhatsApp. Un pedido sin ninguna promo VIVA no cobra salsas mientras `COBRAR_SALSAS_SIN_PROMO = false` (ambas constantes están arriba en `index.html`; `MAX_SALSAS` es el tope del selector por tipo).

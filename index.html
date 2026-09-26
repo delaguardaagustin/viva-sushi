@@ -536,8 +536,12 @@ var WHATSAPP = "56997887871";
    ============================================================ */
 var PEDIR_DIRECCION = true;
 
-/* tope de salsas por tipo (soya y teriyaki): se puede cambiar aquí */
-var MAX_SALSAS = 3;
+var MAX_SALSAS = 10;   /* tope por tipo de salsa (soya / teriyaki) en el selector */
+
+/* Salsas: cada promo VIVA incluye N a elección; cada salsa de más cuesta SALSA_EXTRA.
+   COBRAR_SALSAS_SIN_PROMO: si es false, un pedido sin ninguna promo VIVA no cobra salsas (el local decide). */
+var SALSA_EXTRA = 500;
+var COBRAR_SALSAS_SIN_PROMO = false;
 var HORARIO = { dias: [2, 3, 4, 5, 6], abre: 13, cierra: 22 };
 
 /* ============================================================
@@ -555,7 +559,7 @@ var FOTOS = {
 };
 
 var CARTA = [
-  { cat:"Promociones VIVA", nota:"Todas incluyen salsas a elección (soya y teriyaki). Rolls de 10 piezas.", items:[
+  { cat:"Promociones VIVA", nota:"Todas incluyen salsas a elección (soya y teriyaki); cada salsa extra cuesta $500. Rolls de 10 piezas.", items:[
     {n:"VIVA 1 — 20 piezas frías", d:"10 pzs California Kani (kanikama, queso crema, cebollín, en sésamo o ciboulette) + 10 pzs Maki Cheese (queso crema, cebollín, en alga nori). 1 salsa a elección.", p:4000, tag:"Económica"},
     {n:"VIVA 2 — 20 piezas frías", d:"10 pzs California Vegeta (palmito, queso crema, cebollín, en sésamo o ciboulette) + 10 pzs Maki Palta (palta, cebollín, en alga nori). 1 salsa a elección.", p:4000},
     {n:"VIVA 3 — 20 piezas", d:"10 fritas + 10 frías. Cheese Tory (pollo teriyaki, palta, cebollín, en queso crema) + Tempura Ebi (camarón, queso crema, cebollín, frito). 2 salsas a elección.", p:7000},
@@ -1011,6 +1015,13 @@ if ("IntersectionObserver" in window) {
 }
 
 var bar = document.getElementById("bar");
+function salsasCobro(){
+  var inc = salsasIncluidas();
+  var el = (+document.getElementById("salsaSoya").value) + (+document.getElementById("salsaTeriyaki").value);
+  var extra = (inc > 0 || COBRAR_SALSAS_SIN_PROMO) ? Math.max(0, el - inc) : 0;
+  return { inc: inc, el: el, extra: extra, monto: extra * SALSA_EXTRA };
+}
+function totalFinal(){ return totals().t + salsasCobro().monto; }
 function totals(){
   var n = 0, t = 0;
   for (var k in cart) { n += cart[k].q; t += cart[k].q * cart[k].p; }
@@ -1020,7 +1031,7 @@ function updateBar(){
   var r = totals();
   document.getElementById("barCount").textContent = r.n;
   document.getElementById("barTotal").textContent = clp(r.t);
-  document.getElementById("mTotal").textContent = clp(r.t);
+  document.getElementById("mTotal").textContent = clp(totalFinal());
   if (!modal.classList.contains("show")) bar.classList.toggle("show", r.n > 0);
   guardarCarrito();
 }
@@ -1082,14 +1093,18 @@ function salsasIncluidas(){
   return n;
 }
 function pintarPistas(){
-  var inc = salsasIncluidas();
-  var elegidas = (+document.getElementById("salsaSoya").value) + (+document.getElementById("salsaTeriyaki").value);
+  var c = salsasCobro();
+  var inc = c.inc, elegidas = c.el;
   var ps = document.getElementById("pistaSalsas");
-  var faltan = Math.min(inc, MAX_SALSAS * 2) - elegidas;   /* solo se pueden elegir hasta MAX_SALSAS de cada tipo */
+  var faltan = inc - elegidas;
   if (inc > 0 && faltan > 0) {
-    ps.innerHTML = "Tu pedido incluye <b>" + inc + (inc === 1 ? " salsa" : " salsas") + " a elección</b> (soya o teriyaki; en este pedido puedes elegir hasta " + MAX_SALSAS + " de cada una). Elígelas arriba para que sepamos cuáles poner; te " + (faltan === 1 ? "falta 1" : "faltan " + faltan) + ".";
+    ps.innerHTML = "Tu pedido incluye <b>" + inc + (inc === 1 ? " salsa" : " salsas") + " a elección</b> (soya o teriyaki). Elígelas arriba para que sepamos cuáles poner; te " + (faltan === 1 ? "falta 1" : "faltan " + faltan) + ". Cada salsa extra cuesta <b>" + clp(SALSA_EXTRA) + "</b>.";
+    ps.classList.add("show");
+  } else if (c.extra > 0) {
+    ps.innerHTML = "Salsas extra: <b>" + c.extra + " × " + clp(SALSA_EXTRA) + " = " + clp(c.monto) + "</b> (ya sumado al total)." + (inc > 0 ? " Tu pedido incluye " + inc + (inc === 1 ? " salsa." : " salsas.") : "");
     ps.classList.add("show");
   } else { ps.classList.remove("show"); ps.textContent = ""; }
+  document.getElementById("mTotal").textContent = clp(totalFinal());
   var pp = document.getElementById("pistaPalitos");
   if (document.getElementById("palitos").value === "0") {
     pp.innerHTML = "¿Necesitas palitos? Indica cuántos <b>pares</b> quieres.";
@@ -1326,13 +1341,16 @@ document.getElementById("send").onclick = function(){
     L.push("• " + it.q + "x " + it.n + " - " + clp(it.q * it.p));
   });
   L.push("");
-  L.push("*Total: " + clp(totals().t) + "*");
+  var sc = salsasCobro();
+  if (sc.monto > 0) L.push("• Salsas extra: " + sc.extra + " x " + clp(SALSA_EXTRA) + " - " + clp(sc.monto));
+  L.push("");
+  L.push("*Total: " + clp(totalFinal()) + "*");
   L.push("");
   L.push("Nombre: " + nombre);
   L.push("Contacto: " + telFmt);
   L.push("Modalidad: " + modo);
   if (PEDIR_DIRECCION && direccion) L.push("Dirección: " + direccion);
-  L.push("Salsas: " + salsasTxt);
+  L.push("Salsas: " + salsasTxt + (sc.inc > 0 ? " (incluidas " + sc.inc + ")" : ""));
   L.push("Palitos: " + palitos + " par(es)");
   L.push("Medio de pago: " + pago);
   if (nota) L.push("Comentario: " + nota);
