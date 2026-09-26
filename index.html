@@ -46,7 +46,7 @@
     "opens": "13:00",
     "closes": "22:00"
   }],
-  "paymentAccepted": "Efectivo, débito, crédito, transferencia, Pluxee, Edenred",
+  "paymentAccepted": "Efectivo, débito, crédito",
   "sameAs": [
     "https://www.instagram.com/viva.sushi",
     "https://www.facebook.com/profile.php?id=100055189432842"
@@ -320,11 +320,11 @@ footer .sep{margin:0 8px;color:var(--linea2)}
       <p class="abierto" id="abierto" aria-live="polite"><i aria-hidden="true"></i><span>Martes a sábado, de 13:00 a 22:00</span></p>
     </div>
     <div class="racimo" aria-hidden="true">
-      <figure class="a"><img src="assets/roll-sesamo.jpg" alt="" width="420" height="420"></figure>
-      <figure class="b"><img src="assets/roll-cheese.jpg" alt="" width="420" height="420"></figure>
-      <figure class="c"><img src="assets/roll-palta.jpg" alt="" width="420" height="420"></figure>
-      <figure class="d"><img src="assets/roll-salmon.jpg" alt="" width="420" height="420"></figure>
-      <figure class="e"><img src="assets/roll-nori.jpg" alt="" width="420" height="420"></figure>
+      <figure class="a"><img src="assets/roll-sesamo.jpg" alt="" width="640" height="640"></figure>
+      <figure class="b"><img src="assets/roll-cheese.jpg" alt="" width="640" height="640"></figure>
+      <figure class="c"><img src="assets/roll-palta.jpg" alt="" width="640" height="640"></figure>
+      <figure class="d"><img src="assets/roll-salmon.jpg" alt="" width="640" height="640"></figure>
+      <figure class="e"><img src="assets/roll-nori.jpg" alt="" width="640" height="640"></figure>
     </div>
   </div>
 </div>
@@ -335,7 +335,7 @@ footer .sep{margin:0 8px;color:var(--linea2)}
       <div class="reveal"><dt>Dirección</dt><dd>Santa Rosa #8689<small>San Ramón, Región Metropolitana</small></dd></div>
       <div class="reveal"><dt>Horario</dt><dd>Martes a sábado<small>13:00 a 22:00 hrs · Domingo y lunes cerrado</small></dd></div>
       <div class="reveal"><dt>Modalidades</dt><dd>Para servir o para llevar<small>Atención en el local. No contamos con delivery.</small></dd></div>
-      <div class="reveal"><dt>Medios de pago</dt><dd>Débito, crédito y efectivo<small>Transferencia · Pluxee · Edenred</small></dd></div>
+      <div class="reveal"><dt>Medios de pago</dt><dd>Efectivo, débito y crédito</dd></div>
     </dl>
   </div>
 </section>
@@ -457,11 +457,7 @@ footer .sep{margin:0 8px;color:var(--linea2)}
         <label id="lblPago">Medio de pago <span class="req">*</span></label>
         <div class="seg seg-wrap" id="pago" role="group" aria-labelledby="lblPago">
           <button type="button" data-v="Efectivo">Efectivo</button>
-          <button type="button" data-v="Débito">Débito</button>
-          <button type="button" data-v="Crédito">Crédito</button>
-          <button type="button" data-v="Transferencia">Transferencia</button>
-          <button type="button" data-v="Pluxee">Pluxee</button>
-          <button type="button" data-v="Edenred">Edenred</button>
+          <button type="button" data-v="Débito/Crédito">Débito / Crédito</button>
         </div>
       </div>
       <div class="field"><label for="nota">Comentarios <span class="opt">(opcional)</span></label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00…"></textarea></div>
@@ -503,6 +499,9 @@ var WHATSAPP = "56997887871";
    HORARIO: dias 0=domingo ... 6=sábado; hora de Santiago.
    ============================================================ */
 var PEDIR_DIRECCION = true;
+
+/* tope de salsas por tipo (soya y teriyaki): se puede cambiar aquí */
+var MAX_SALSAS = 3;
 var HORARIO = { dias: [2, 3, 4, 5, 6], abre: 13, cierra: 22 };
 
 /* ============================================================
@@ -1050,9 +1049,9 @@ function pintarPistas(){
   var inc = salsasIncluidas();
   var elegidas = (+document.getElementById("salsaSoya").value) + (+document.getElementById("salsaTeriyaki").value);
   var ps = document.getElementById("pistaSalsas");
-  var faltan = inc - elegidas;
+  var faltan = Math.min(inc, MAX_SALSAS * 2) - elegidas;   /* solo se pueden elegir hasta MAX_SALSAS de cada tipo */
   if (inc > 0 && faltan > 0) {
-    ps.innerHTML = "Tu pedido incluye <b>" + inc + (inc === 1 ? " salsa" : " salsas") + " a elección</b> (soya o teriyaki). Elígelas arriba para que sepamos cuáles poner; te " + (faltan === 1 ? "falta 1" : "faltan " + faltan) + ".";
+    ps.innerHTML = "Tu pedido incluye <b>" + inc + (inc === 1 ? " salsa" : " salsas") + " a elección</b> (soya o teriyaki; en este pedido puedes elegir hasta " + MAX_SALSAS + " de cada una). Elígelas arriba para que sepamos cuáles poner; te " + (faltan === 1 ? "falta 1" : "faltan " + faltan) + ".";
     ps.classList.add("show");
   } else { ps.classList.remove("show"); ps.textContent = ""; }
   var pp = document.getElementById("pistaPalitos");
@@ -1206,10 +1205,10 @@ document.getElementById("modo").addEventListener("click", function(e){
   modo = b.dataset.m;
 });
 
-/* opciones 0 a 10 para salsas y palitos */
-["salsaSoya", "salsaTeriyaki", "palitos"].forEach(function(id){
-  var sel = document.getElementById(id);
-  for (var i = 0; i <= 10; i++) {
+/* opciones para salsas (0 a 3 de cada una) y palitos (0 a 10) */
+[["salsaSoya", MAX_SALSAS], ["salsaTeriyaki", MAX_SALSAS], ["palitos", 10]].forEach(function(par){
+  var sel = document.getElementById(par[0]);
+  for (var i = 0; i <= par[1]; i++) {
     var o = document.createElement("option");
     o.value = i; o.textContent = i;
     sel.appendChild(o);
