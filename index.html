@@ -377,7 +377,7 @@ footer .sep{margin:0 8px;color:var(--linea2)}
     <dl class="ficha">
       <div class="reveal"><dt>Dirección</dt><dd>Santa Rosa #8689<small>San Ramón, Región Metropolitana</small></dd></div>
       <div class="reveal"><dt>Horario</dt><dd>Martes a sábado<small>13:00 a 22:00 hrs · Domingo y lunes cerrado</small></dd></div>
-      <div class="reveal"><dt>Modalidades</dt><dd>Para servir o para llevar<small>Atención en el local. No contamos con delivery.</small></dd></div>
+      <div class="reveal"><dt>Modalidades</dt><dd>Para servir, para llevar o delivery<small>Delivery $2.500, solo en La Granja y San Ramón.</small></dd></div>
       <div class="reveal"><dt>Medios de pago</dt><dd>Efectivo, débito y crédito</dd></div>
     </dl>
   </div>
@@ -474,7 +474,7 @@ footer .sep{margin:0 8px;color:var(--linea2)}
           </div>
         </div>
       </div>
-      <div class="field" id="campoDireccion"><label for="direccion">Dirección <span class="opt">(solo si es despacho)</span></label><input id="direccion" placeholder="Calle y número, depto, comuna" autocomplete="street-address"></div>
+      <div class="field" id="campoDireccion"><label for="direccion" id="lblDireccion">Dirección <span class="opt">(solo si es despacho)</span></label><input id="direccion" placeholder="Calle y número, depto, comuna" autocomplete="street-address"><p class="pista" id="pistaDelivery" role="status"></p></div>
     </div>
 
     <div class="fsec">
@@ -484,6 +484,7 @@ footer .sep{margin:0 8px;color:var(--linea2)}
         <div class="seg" id="modo" role="group" aria-labelledby="lblModo">
           <button type="button" class="on" data-m="Para llevar">Para llevar</button>
           <button type="button" data-m="Para servir">Para servir</button>
+          <button type="button" data-m="Delivery">Delivery</button>
         </div>
       </div>
       <div class="salsas-box" id="salsasIncBox" hidden>
@@ -515,6 +516,10 @@ footer .sep{margin:0 8px;color:var(--linea2)}
         <div class="seg seg-wrap" id="pago" role="group" aria-labelledby="lblPago">
           <button type="button" data-v="Efectivo">Efectivo</button>
           <button type="button" data-v="Débito/Crédito">Débito / Crédito</button>
+          <button type="button" data-v="Transferencia">Transferencia</button>
+          <button type="button" data-v="JUNAEB">JUNAEB</button>
+          <button type="button" data-v="Edenred">Edenred</button>
+          <button type="button" data-v="Amipass">Amipass</button>
         </div>
       </div>
       <div class="field"><label for="nota">Comentarios <span class="opt">(opcional)</span></label><textarea id="nota" placeholder="Sin palta, salsa extra, para las 21:00…"></textarea></div>
@@ -563,6 +568,8 @@ var MAX_SALSAS = 10;   /* tope por tipo de salsa (soya / teriyaki) en el selecto
 /* Salsas: cada promo VIVA incluye N a elección; cada salsa de más cuesta SALSA_EXTRA.
    COBRAR_SALSAS_SIN_PROMO: si es false, un pedido sin ninguna promo VIVA no cobra salsas (el local decide). */
 var SALSA_EXTRA = 500;
+var DELIVERY_COSTO = 2500;   /* delivery a $2.500 fijo, solo La Granja y San Ramón (dato del dueño) */
+var DELIVERY_COMUNAS = "La Granja y San Ramón";
 /* Salsas incluidas por producto (según el dueño, 26-09-2026):
    - cada promo VIVA trae las que dice su descripción ("N salsas a elección");
    - cada roll de estas categorías trae 1 salsa por unidad, salvo los códigos de SIN_SALSA
@@ -1052,7 +1059,9 @@ function salsasCobro(){
   var extra = (inc > 0 || COBRAR_SALSAS_SIN_PROMO) ? ext : 0;
   return { inc: inc, el: incEl, ext: ext, extra: extra, monto: extra * SALSA_EXTRA };
 }
-function totalFinal(){ return totals().t + salsasCobro().monto; }
+function esDelivery(){ return modo === "Delivery"; }
+function deliveryCosto(){ return esDelivery() ? DELIVERY_COSTO : 0; }
+function totalFinal(){ return totals().t + salsasCobro().monto + deliveryCosto(); }
 function totals(){
   var n = 0, t = 0;
   for (var k in cart) { n += cart[k].q; t += cart[k].q * cart[k].p; }
@@ -1135,6 +1144,18 @@ function llenarSel(id, max, val){
   sel.value = String(Math.min(val, max));
 }
 /* Las salsas incluidas (soya + teriyaki) nunca pueden pasar de las que trae la promo */
+function pintarDelivery(){
+  var lbl = document.getElementById("lblDireccion"), px = document.getElementById("pistaDelivery");
+  if (esDelivery()) {
+    lbl.innerHTML = 'Dirección <span class="req">*</span>';
+    px.innerHTML = "Delivery: <b>" + clp(DELIVERY_COSTO) + "</b>, solo en " + DELIVERY_COMUNAS + ". Indica calle, número, depto y comuna.";
+    px.classList.add("show");
+  } else {
+    lbl.innerHTML = 'Dirección <span class="opt">(solo si es despacho)</span>';
+    px.classList.remove("show"); px.textContent = "";
+  }
+  document.getElementById("mTotal").textContent = clp(totalFinal());
+}
 function ajustarSalsas(){
   var inc = salsasIncluidas();
   var box = document.getElementById("salsasIncBox");
@@ -1246,6 +1267,7 @@ function openModal(){
   ultimoFoco = document.activeElement;
   renderLines();
   pintarEstado();
+  pintarDelivery();
   // volver al estado inicial del formulario (por si ya se habia enviado antes)
   document.getElementById("sendWrap").style.display = "";
   document.getElementById("done").classList.remove("show");
@@ -1323,6 +1345,7 @@ document.getElementById("modo").addEventListener("click", function(e){
   document.querySelectorAll("#modo button").forEach(function(x){ x.classList.remove("on"); });
   b.classList.add("on");
   modo = b.dataset.m;
+  pintarDelivery();
 });
 
 ["salsaSoyaX", "salsaTeriyakiX"].forEach(function(id){ llenarSel(id, MAX_SALSAS, 0); document.getElementById(id).addEventListener("change", pintarPistas); });
@@ -1393,6 +1416,7 @@ document.getElementById("send").onclick = function(){
 
   if (!nombre)              { fail("Escribe tu nombre para el pedido.", document.getElementById("nombre")); return; }
   if (contacto.length !== 8) { fail("Escribe los 8 dígitos de tu número (después del +56 9).", document.getElementById("telNum")); return; }
+  if (esDelivery() && !direccion) { fail("Escribe tu dirección para el delivery.", document.getElementById("direccion")); return; }
   if (!pago)                 { fail("Elige un medio de pago.", document.getElementById("pago")); return; }
 
   var telFmt = "+56 9 " + contacto.slice(0, 4) + " " + contacto.slice(4);
@@ -1407,6 +1431,7 @@ document.getElementById("send").onclick = function(){
   L.push("");
   var sc = salsasCobro();
   if (sc.monto > 0) L.push("• Salsas extra: " + sc.extra + " x " + clp(SALSA_EXTRA) + " - " + clp(sc.monto));
+  if (esDelivery()) L.push("• Delivery (" + DELIVERY_COMUNAS + ") - " + clp(DELIVERY_COSTO));
   L.push("");
   L.push("*Total: " + clp(totalFinal()) + "*");
   L.push("");
@@ -1730,7 +1755,7 @@ function ayUbicacion(){
   ayResponde("Estamos en Santa Rosa #8689, San Ramón.", [ayActs(ayLink("Cómo llegar", ayMapsUrl(), "btn-ghost"))]);
 }
 function ayPago(){
-  ayResponde("Los medios de pago son efectivo y débito/crédito; lo eliges al enviar tu pedido. No tengo confirmado ningún otro medio: si quieres consultar algo distinto, pregúntale al local.", [ayActs(ayWaBtn("Hola, quería consultar por los medios de pago."))]);
+  ayResponde("Los medios de pago son efectivo, débito/crédito, transferencia, JUNAEB, Edenred y Amipass; lo eliges al enviar tu pedido.", [ayActs(ayWaBtn("Hola, quería consultar por los medios de pago."))]);
 }
 function ayBuscarPorCodigo(t){
   var m = /\b(e\d{1,2}|viva\s*\d{1,2}|\d{1,2})\b/.exec(t.replace(/^.*?\b(roll|promo|el|la)\b\s*/, ""));
@@ -1754,8 +1779,8 @@ function aySalsas(t){
 function ayModalidad(){
   /* usa el texto real de la ficha de la pagina; no afirma nada sobre despacho mas alla de eso */
   var f = [].filter.call(document.querySelectorAll(".ficha > div"), function(x){ return /modalidades/i.test(x.textContent); })[0];
-  var pag = f && f.querySelector("small") ? f.querySelector("small").textContent.trim() : "Atención en el local. No contamos con delivery.";
-  ayResponde("Modalidades: para servir o para llevar. " + pag, [ayActs(ayLink("Cómo llegar", ayMapsUrl(), "btn-ghost"))]);
+  var pag = f && f.querySelector("small") ? f.querySelector("small").textContent.trim() : "Delivery " + clp(DELIVERY_COSTO) + ", solo en " + DELIVERY_COMUNAS + ".";
+  ayResponde("Modalidades: para servir en el local, para llevar o delivery. " + pag, [ayActs(ayLink("Cómo llegar", ayMapsUrl(), "btn-ghost"))]);
 }
 function ayTotal(){
   var r = totals();
