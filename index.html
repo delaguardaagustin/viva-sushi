@@ -114,13 +114,13 @@ header{position:sticky;top:0;z-index:50;background:var(--sumi);border-bottom:1px
 /* racimo de rolls: círculos de distinto tamaño sobre un aro rojo */
 .racimo{position:relative;width:min(100%,380px);aspect-ratio:1;margin:0 auto}
 .racimo::before{content:"";position:absolute;inset:4%;border-radius:50%;border:3px solid var(--rojo)}
-.racimo figure{position:absolute;border-radius:50%;overflow:hidden;background:var(--sumi3);border:3px solid var(--sumi)}
+.racimo figure{position:absolute;aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--sumi3);border:3px solid var(--sumi)}
 .racimo img{width:100%;height:100%;object-fit:cover}
-.racimo .a{width:44%;left:6%;top:12%}
-.racimo .b{width:32%;right:6%;top:4%}
-.racimo .c{width:38%;right:2%;top:40%}
-.racimo .d{width:30%;left:12%;bottom:6%}
-.racimo .e{width:26%;left:46%;bottom:2%}
+.racimo .d{width:56%;left:22%;top:16%;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.racimo .deco{background:linear-gradient(135deg,var(--rojo),#8a1620)}
+.racimo .f1{width:26%;right:4%;top:2%}
+.racimo .f2{width:20%;left:2%;bottom:10%}
+.racimo .f3{width:16%;right:10%;bottom:0}
 
 /* ---------- FICHA ---------- */
 .info{padding:0}
@@ -363,11 +363,10 @@ footer .sep{margin:0 8px;color:var(--linea2)}
       <p class="abierto" id="abierto" aria-live="polite"><i aria-hidden="true"></i><span>Martes a sábado, de 13:00 a 22:00</span></p>
     </div>
     <div class="racimo" aria-hidden="true">
-      <figure class="a"><img src="assets/roll-sesamo.jpg" alt="" width="640" height="640"></figure>
-      <figure class="b"><img src="assets/roll-cheese.jpg" alt="" width="640" height="640"></figure>
-      <figure class="c"><img src="assets/roll-palta.jpg" alt="" width="640" height="640"></figure>
-      <figure class="d"><img src="assets/roll-salmon.jpg" alt="" width="640" height="640"></figure>
-      <figure class="e"><img src="assets/roll-nori.jpg" alt="" width="640" height="640"></figure>
+      <figure class="f1 deco"></figure>
+      <figure class="d"><img src="assets/roll-salmon.jpg" alt="" width="640" height="640" loading="lazy"></figure>
+      <figure class="f2 deco"></figure>
+      <figure class="f3 deco"></figure>
     </div>
   </div>
 </div>
@@ -586,12 +585,10 @@ var HORARIO = { dias: [2, 3, 4, 5, 6], abre: 13, cierra: 22 };
    Si no hay foto, se muestra el numero de la categoria.
    ============================================================ */
 var FOTOS = {
-  "California Rolls": "assets/roll-sesamo.jpg",
-  "Cheese Rolls":     "assets/roll-cheese.jpg",
-  "Avocado Rolls":    "assets/roll-palta.jpg",
-  "Sake Rolls":       "assets/roll-salmon.jpg",
-  "Hosomaki Rolls":   "assets/roll-nori.jpg",
-  "Futomaki":         "assets/roll-nori.jpg"
+  "Sake Rolls":       "assets/roll-salmon.jpg"
+  /* Las demás categorías no tienen foto real todavía: se muestra el número
+     (ver abajo, FOTOS[c.cat] ? imagen : número). Cuando lleguen fotos nítidas
+     del local, se agregan aquí con el nombre exacto de la categoría. */
 };
 
 var CARTA = [
